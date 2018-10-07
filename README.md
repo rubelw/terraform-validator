@@ -34,14 +34,14 @@ Installation
 terraform-validator is on PyPI so all you need is:
 
 ``` {.sourceCode .console}
-$ pip install tf-validator
+$ pip install terraform-validator
 ```
 
 
 Demonstration
 =============
 
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/rubelw/cloudformation-validator/blob/master/images/cfngit.gif"><img src="https://github.com/rubelw/cloudformation-validator/raw/master/images/cfngit.gif" alt="Cloudformation Validator tutorial" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/rubelw/cloudformation-validator/blob/master/images/cfngit.gif"><img src="https://github.com/rubelw/terraform-validator/raw/master/images/cfngit.gif" alt="Cloudformation Validator tutorial" style="max-width:100%;"></a></p>
 
 
 Just run:
@@ -50,8 +50,8 @@ Just run:
 $ pip install virtualenv
 $ which python
 $ virtualenv ~/virtualenvs/my_project -p /home/example_username/opt/python-3.6.2/bin/python3
-$ git clone https://github.com/rubelw/cloudformation-validator.git
-$ cd cloudformation-validator
+$ git clone https://github.com/rubelw/terraform-validator.git
+$ cd terraform-validator
 $ pip install -r requirements-dev.txt
 $ python setup.py install --force
 $ python setup.py test}
@@ -64,8 +64,8 @@ Make sure the required python versions are installed and run:
 $ pip install virtualenv
 $ which python
 $ virtualenv ~/virtualenvs/my_project -p /home/example_username/opt/python-3.6.2/bin/python3
-$ git clone https://github.com/rubelw/cloudformation-validator.git
-$ cd cloudformation-validator
+$ git clone https://github.com/rubelw/terraform-validator.git
+$ cd terraform-validator
 $ pip install -r requirements-dev.txt
 $ python setup.py install --force
 $ pip install tox  # first time only
@@ -76,7 +76,7 @@ Listing Rules
 =============
 
 ``` {.sourceCode .console}
-$ cfn-validator dump_rules
+$ tf-validator dump_rules
 ##################################
 ########## WARNINGS ##############
 ##################################
@@ -91,7 +91,7 @@ Example
 Getting help
 
 ``` {.sourceCode .console}
-$ cfn-validator validate --help
+$ tf-validator validate --help
 Usage: cfn-validator validate [OPTIONS]
 
   primary function for validating a template :param template_path: :param
@@ -103,7 +103,6 @@ Usage: cfn-validator validate [OPTIONS]
 Options:
   -s, --suppress-errors           Whether to suppress misc errors to get hash only
   -t, --template-path TEXT        base directory to search for templates
-  -f, --template-file TEXT        single_template_file
   --debug                         Turn on debugging
   -r, --rules-directory TEXT      Extra rule directory
   -o, --profile-path TEXT         Path to a profile file
@@ -124,13 +123,13 @@ Options:
 Validate a file
 
 ``` {.sourceCode .console}
-$cfn-validator validate -f cloudfront_distribution_without_logging.json
+$tf-validator validate -f terraform_distribution_without_logging.json
 
-Evaluating: cloudfront_distribution_without_logging.json
+Evaluating: terraform_distribution_without_logging.json
 [
     {
         'failure_count': '0',
-        'filename': 'cloudfront_distribution_without_logging.json',
+        'filename': 'terraform_distribution_without_logging.json',
         'file_results': [
             {
                 'id': 'W10',
@@ -148,14 +147,14 @@ Evaluating: cloudfront_distribution_without_logging.json
 Validate all files in a path
 
 ``` {.sourceCode .console}
-$cfn-validator validate -f /projects
+$tf-validator validate -f /projects
 ...
 ```
 
-Programmatically call cfn-validator to analyze a file
+Programmatically call tf-validator to analyze a file
 
 ``` {.sourceCode .console}
-from cloudformation_validator.ValidateUtility import ValidateUtility
+from terraform_validator.ValidateUtility import ValidateUtility
 
 config_dict = {}
 config_dict['template_file'] = '/tmp/template.json'
@@ -185,7 +184,7 @@ I you get some errors and warnings in your out put, you can pass-in the
 flag to suppress all errors
 
 ``` {.sourceCode .console}
-from cloudformation_validator.ValidateUtility import ValidateUtility
+from terraform_validator.ValidateUtility import ValidateUtility
 
 config_dict = {}
 config_dict['suppress_errors'] = True
@@ -407,7 +406,7 @@ class Ec2CustomTagsRule(BaseRule):
 -   Run the test
 
 ``` {.sourceCode .console
-cfn-validator validate --template-file=/tmp/template.json --rules-directory=/home/user/custom_validator_rules}
+tf-validator validate --template-path test/ --rules-directory=/home/user/custom_validator_rules}
 ```
 
 -   You should receive the following violations
@@ -437,7 +436,7 @@ cfn-validator validate --template-file=/tmp/template.json --rules-directory=/hom
 }
 ```
 
--   No add tags property to the cloudformation template and run again
+-   No add tags property to the tf template and run again
 
 ``` {.sourceCode .console
 {
@@ -526,12 +525,11 @@ Source
 ======
 
 I am just getting started on this, so any suggestions would be welcome.
-\<<https://github.com/rubelw/cloudformation-validator>\>
+\<<https://github.com/rubelw/terraform-validator>\>
 
 Copyright
 =========
 
 terraform\_validator is an open source project by Will Rubel
 \<<https://www.linkedin.com/in/will-rubel-03205b2a/>\>, that was ported
-from a ruby project by Stelligent. See the original LICENSE information
-\<<https://github.com/stelligent/cfn_nag/blob/master/LICENSE.md>\>.
+from my cloudformation-validator project.
