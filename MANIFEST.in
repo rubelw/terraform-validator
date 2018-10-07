@@ -1,0 +1,6 @@
+include LICENSE
+include README.rst
+
+include terraform_validator/test_templates/json/*/*.json
+include terraform_model/schema/*.yml
+include terraform_model/schema/*.erb
