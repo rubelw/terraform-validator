@@ -39,7 +39,7 @@ $ pip install terraform-validator
 Demonstration
 =============
 
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/rubelw/cloudformation-validator/blob/master/images/demo.gif"><img src="https://github.com/rubelw/terraform-validator/raw/master/images/cfngit.gif" alt="Cloudformation Validator tutorial" style="max-width:100%;"></a></p>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/rubelw/terraform-validator/blob/master/images/demo.gif"><img src="https://github.com/rubelw/terraform-validator/raw/master/images/cfngit.gif" alt="Cloudformation Validator tutorial" style="max-width:100%;"></a></p>
 
 
 Just run:
