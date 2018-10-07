@@ -4,9 +4,7 @@ Terraform-Validator
 Features
 ========
 
-#######################################
-NOT READY FOR USE YET, BUT SOON
-#######################################
+############### NOT READY FOR USE YET, BUT SOON ##############
 
 terraform\_validator provides type checking and other base
 functionality out of the box and is designed to be non-blocking and
