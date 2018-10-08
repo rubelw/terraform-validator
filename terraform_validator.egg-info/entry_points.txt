@@ -1,0 +1,4 @@
+
+        [console_scripts]
+        tf-validator=terraform_validator.command:cli
+    
