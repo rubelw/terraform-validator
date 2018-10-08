@@ -1,4 +1,0 @@
-[
-  "test/test_ec2_instance.py::TestEc2Instance::test_ec2_instance_authentication",
-  "test/test_ec2_instance.py::TestEc2Instance::test_ec2_instance_insensitive_authentication"
-]

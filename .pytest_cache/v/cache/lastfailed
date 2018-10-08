@@ -1,6 +1,0 @@
-{
-  "test/test_cloudfront_distribution.py::TestCloudDistribution::test_cloudformation": true,
-  "test/test_command.py::TestCommand::test_check_for_updates_outdated_version": true,
-  "test/test_ec2_instance.py::TestEc2Instance::test_ec2_instance_authentication": true,
-  "test/test_ec2_instance.py::TestEc2Instance::test_ec2_instance_insensitive_authentication": true
-}
