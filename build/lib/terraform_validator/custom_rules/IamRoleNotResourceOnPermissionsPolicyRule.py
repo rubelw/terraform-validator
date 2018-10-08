@@ -1,23 +1,24 @@
 from __future__ import absolute_import, division, print_function
-import inspect
 import sys
+import inspect
 from builtins import (str)
+from terraform_validator.Violation import Violation
 from terraform_validator.custom_rules.BaseRule import BaseRule
 
 def lineno():
     """Returns the current line number in our program."""
-    return str(' - IamRoleWildcardActionOnPermissionsPolicyRule- caller: '+str(inspect.stack()[1][3])+'  - line number: '+str(inspect.currentframe().f_back.f_lineno))
+    return str(' - IamRoleNotResourceOnPermissionsPolicyRule - caller: '+str(inspect.stack()[1][3])+' - line number: '+str(inspect.currentframe().f_back.f_lineno))
 
 
-class IamRoleWildcardActionOnPermissionsPolicyRule(BaseRule):
-  
+class IamRoleNotResourceOnPermissionsPolicyRule(BaseRule):
+
   def __init__(self, cfn_model=None, debug=None):
     """
     Initialize
     :param cfn_model: 
     """
-    BaseRule.__init__(self, cfn_model=cfn_model,debug=debug)
-      
+    BaseRule.__init__(self, cfn_model, debug=debug)
+
   def rule_text(self):
     """
     Get rule text
@@ -25,7 +26,7 @@ class IamRoleWildcardActionOnPermissionsPolicyRule(BaseRule):
     """
     if self.debug:
       print('rule_text'+lineno())
-    return 'IAM role should not allow * action on its permissions policy'
+    return 'IAM role should not allow Allow+NotResource'
 
 
   def rule_type(self):
@@ -33,8 +34,8 @@ class IamRoleWildcardActionOnPermissionsPolicyRule(BaseRule):
     Get rule type
     :return: 
     """
-    self.type= 'VIOLATION::FAILING_VIOLATION'
-    return 'VIOLATION::FAILING_VIOLATION'
+    self.type= 'VIOLATION::WARNING'
+    return 'VIOLATION::WARNING'
 
 
   def rule_id(self):
@@ -44,8 +45,8 @@ class IamRoleWildcardActionOnPermissionsPolicyRule(BaseRule):
     """
     if self.debug:
       print('rule_id'+lineno())
-    self.id ='F3'
-    return 'F3'
+    self.id ='W21'
+    return 'W21'
 
 
   def audit_impl(self):
@@ -54,23 +55,19 @@ class IamRoleWildcardActionOnPermissionsPolicyRule(BaseRule):
     :return: violations 
     """
     if self.debug:
-      print("\n\n###############################################")
-      print('IamRoleWildcardActionOnPermissionsPolicyRule - audit_impl'+lineno())
-      print("###################################################\n")
+      print('IamRoleNotResourceOnPermissionPolicyRule - audit_impl'+lineno())
+
+      print('vars: '+str(vars(self)))
+      print('dir: '+str(dir(self)))
 
     violating_roles = []
-
 
     resources = self.cfn_model.resources_by_type('AWS::IAM::Role')
 
     if len(resources)>0:
-
-      if self.debug:
-        print('there is a resource'+lineno())
-
       for resource in resources:
           if self.debug:
-            print('resource: '+str(resources)+lineno())
+            print('resource: '+str(resource)+lineno())
 
           if hasattr(resource, 'policy_objects'):
             if self.debug:
@@ -78,16 +75,16 @@ class IamRoleWildcardActionOnPermissionsPolicyRule(BaseRule):
 
             for policy in resource.policy_objects:
 
-              if self.debug:
-                print('policy: '+str(policy.policy_objects)+lineno())
-
-              if policy.policy_document.wildcard_allowed_actions():
+              if policy.policy_document.allows_not_resource():
                 if self.debug:
-                  print('has wildcard allowed actions')
+                  print('has allows not resources')
 
                 violating_roles.append(str(resource.logical_resource_id))
     else:
       if self.debug:
         print('no violating_roles' + lineno())
 
+    if self.debug:
+      print('returning violating_roles to'+lineno())
+        
     return violating_roles
