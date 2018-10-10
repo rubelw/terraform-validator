@@ -31,14 +31,20 @@ class IamRoleParser:
             print('managed policy arn: '+str(resource.managedPolicyArns)+lineno())
             print('policy objects: '+str(resource.policy_objects)+lineno())
             print('assume role policy document: '+str(resource.assume_role_policy_document)+lineno())
+            print('raw model: '+str(resource.raw_model)+lineno())
 
         iam_role = resource
 
         document_parser =  PolicyDocumentParser(debug=debug)
 
-        #if 'assume_role_policy'
-        iam_role.assume_role_policy_document  =document_parser.parse(iam_role.assumeRolePolicyDocument)
-        sys.exit(1)
+
+        if debug:
+            print('iam_role: '+str(iam_role)+lineno())
+            print('vars: '+str(vars(iam_role)))
+
+        if iam_role.assume_role_policy:
+            iam_role.assume_role_policy_document  =document_parser.parse(iam_role.assume_role_policy)
+
 
         for policy in iam_role.policies:
             if debug:

@@ -330,8 +330,8 @@ class ValidateUtility:
                             print('data is now: '+str(data)+lineno())
 
                         #file_data = file_data + data+','
-
-                        print('file data: '+str(file_data)+lineno())
+                        if self.debug:
+                            print('file data: '+str(file_data)+lineno())
 
                     except Exception as e:
                         print("\n##############################")
@@ -417,7 +417,8 @@ class ValidateUtility:
 
         #file_data = file_data + '}'
 
-        print('file data is now: ' + str(file_data) + lineno())
+        if self.debug:
+            print('file data is now: ' + str(file_data) + lineno())
 
         #if type(file_data) == type(str()):
         #    json_acceptable_string = file_data.replace("'", "\"")
@@ -430,8 +431,10 @@ class ValidateUtility:
         #    print("Starting to audit template "+lineno())
         #    print("#############################\n")
 
-        print('made it'+lineno())
-        print('parameter values: '+str(parameter_values_string)+lineno())
+        if self.debug:
+            print('made it'+lineno())
+            print('parameter values: '+str(parameter_values_string)+lineno())
+
         file_results = self.audit(cloudformation_string=file_data, parameter_values_string= parameter_values_string)
 
 

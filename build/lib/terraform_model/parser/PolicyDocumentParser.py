@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function
 import sys
 import inspect
+import json
 from terraform_model.model.PolicyDocument import PolicyDocument
 from terraform_model.model.Statement import Statement
 
@@ -36,7 +37,17 @@ class PolicyDocumentParser:
 
         policy_document = PolicyDocument(debug=self.debug)
 
+
+        if type(raw_policy_document) == type(str()):
+            json_acceptable_string = raw_policy_document.replace("'", "\"")
+            raw_policy_document= json.loads(json_acceptable_string)
+
         if 'Version' in raw_policy_document:
+            if self.debug:
+                print('version in policy document: '+lineno())
+                print('type: '+str(type(raw_policy_document)))
+
+                print('version: '+str(raw_policy_document['Version'])+lineno())
 
             policy_document.version = raw_policy_document['Version']
 

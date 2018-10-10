@@ -125,9 +125,9 @@ class CfnParser:
         cfn_model = CfnModel.CfnModel(debug=self.debug)
         cfn_model.raw_model=cloudformation_yml
 
+
         # pass 1: wire properties into ModelElement objects
         cfn_model = self.transform_hash_into_model_elements(cloudformation_yml, cfn_model)
-
 
         if self.debug:
             print("\n\n#################################################")
@@ -140,23 +140,22 @@ class CfnParser:
                 print('resource_type: '+str(cfn_model.resources[r].resource_type)+lineno())
                 print('logical_resource_id: '+str(cfn_model.resources[r].logical_resource_id)+lineno())
                 print('metadata: '+str(cfn_model.resources[r].metadata)+lineno())
-                print(str(vars(cfn_model.resources[r]))+lineno())
-                print(str(cfn_model.resources[r].raw_model.raw_model)+lineno())
+                print('vars: '+str(vars(cfn_model.resources[r]))+lineno())
+                print('raw model: '+str(cfn_model.resources[r].raw_model.raw_model)+lineno())
                 print("##################################################\n")
 
             print("\n##################################################")
             print('properties wired into model element objects'+lineno())
             print("##################################################\n")
 
-        if self.debug:
 
+        if self.debug:
             print("\n##################################################")
             print('Transforming hash into parameters'+lineno())
             print("##################################################\n")
 
         # Transform cloudformation parameters into parameters object
         cfn_model = self.transform_hash_into_parameters(cloudformation_yml,cfn_model)
-
 
         if self.debug:
             print("\n##################################################")
@@ -302,20 +301,30 @@ class CfnParser:
 
             for resource_name in cfn_hash['resource'][resource_type]:
 
+                if self.debug:
+                    print('resource type: '+str(resource_type)+lineno())
+                    print('resource name: '+str(resource_name)+lineno())
+                    input('enter'+lineno())
+
                 # Create a new resource class based on the name of the resource
                 # Does this by getting the resource type, and creating object based on resource type
                 resource_class = self.class_from_type_name(resource_type,resource_name)
 
+                if self.debug:
+                    print('resource class: '+str(resource_class)+lineno())
+                    input('enter'+lineno())
+
+                # This is the original model
                 resource_class.raw_model= cfn_model
 
                 if self.debug:
                     print('Setting logical resource id to: '+str(resource_name)+lineno())
-                resource_class.logical_resource_id = resource_name
 
+                resource_class.logical_resource_id = resource_name
 
                 resource_class.resource_type = resource_type
                 if 'metadata' in cfn_hash['resource'][resource_type][resource_name]:
-                    resource_class.metadata = cfn_hash['resource'][resoure_type][resource_name]['metadata']
+                    resource_class.metadata = cfn_hash['resource'][resource_type][resource_name]['metadata']
 
                 if self.debug:
                     print("\n#############################################")
@@ -323,6 +332,10 @@ class CfnParser:
                     print("###############################################\n")
 
                 resource_class = self.assign_fields_based_upon_properties(resource_class, cfn_hash['resource'][resource_type][resource_name])
+
+                if self.debug:
+                    print('There fields are no assigned to properties'+lineno())
+                    input('enter: '+lineno())
 
                 cfn_model.resources[resource_name]=resource_class
 
@@ -402,39 +415,41 @@ class CfnParser:
             if self.debug:
                 print('data in hash: '+str(cfn_hash['data'])+lineno())
 
-            for data in cfn_hash['data']:
+            for cfdata in cfn_hash['data']:
 
                 data = Data(debug=self.debug)
-                data.id = data
+                data.id = cfdata
 
                 if self.debug:
+                    print('data is: '+str(cfdata)+lineno())
                     print('data id: ' + str(data.id) + lineno())
 
-                if cfn_hash['data'][data]:
+                if cfn_hash['data'][cfdata]:
 
                     if self.debug:
-                        print('data is: '+str(cfn_hash['data'][data])+lineno())
+                        print('data is: '+str(cfn_hash['data'][cfdata])+lineno())
 
-                    for param in cfn_hash['data'][data]:
+                    for param in cfn_hash['data'][cfdata]:
 
                         if self.debug:
                             print("\n###############################")
                             print('data: '+str(param)+lineno())
-                            print('value: '+str(cfn_hash['variable'][data][param])+lineno())
+                            print('param: '+str(param)+lineno())
+                            print('value: '+str(cfn_hash['data'][cfdata][param])+lineno())
                             print("##################################\n")
 
                         if param == 'default':
-                            data.type = str(type(cfn_hash['data'][data][param]))
+                            data.type = str(type(cfn_hash['data'][cfdata][param]))
                         else:
                             if self.debug:
                                 print('no default data'+lineno())
 
                         if self.debug:
-                            print('adding data: '+str(param)+'='+str(cfn_hash['data'][data][param])+lineno())
+                            print('adding data: '+str(param)+'='+str(cfn_hash['data'][cfdata][param])+lineno())
 
-                        data.instance_data.append(param+'='+str(cfn_hash['data'][data][param]))
+                        data.instance_data.append(param+'='+str(cfn_hash['data'][cfdata][param]))
 
-                    cfn_model.data[param] = data
+                    cfn_model.data[param] = cfdata
 
 
 
@@ -443,37 +458,37 @@ class CfnParser:
             if self.debug:
                 print('locals in hash: '+str(cfn_hash['local'])+lineno())
 
-            for local in cfn_hash['local']:
+            for cflocal in cfn_hash['local']:
 
                 locals = Locals(debug=self.debug)
-                locals.id = local
+                locals.id = cflocal
 
                 if self.debug:
                     print('locals id: ' + str(locals.id) + lineno())
 
-                if cfn_hash['local'][local]:
+                if cfn_hash['local'][cflocal]:
 
                     if self.debug:
-                        print('local is: '+str(cfn_hash['local'][local])+lineno())
+                        print('local is: '+str(cfn_hash['local'][cflocal])+lineno())
 
-                    for param in cfn_hash['local'][local]:
+                    for param in cfn_hash['local'][cflocal]:
 
                         if self.debug:
                             print("\n###############################")
                             print('local: '+str(param)+lineno())
-                            print('value: '+str(cfn_hash['local'][local][param])+lineno())
+                            print('value: '+str(cfn_hash['local'][cflocal][param])+lineno())
                             print("##################################\n")
 
                         if param == 'default':
-                            locals.type = str(type(cfn_hash['local'][local][param]))
+                            locals.type = str(type(cfn_hash['local'][cflocal][param]))
                         else:
                             if self.debug:
                                 print('no default local'+lineno())
 
                         if self.debug:
-                            print('adding local: '+str(param)+'='+str(cfn_hash['local'][local][param])+lineno())
+                            print('adding local: '+str(param)+'='+str(cfn_hash['local'][cflocal][param])+lineno())
 
-                        locals.instance_locals.append(param+'='+str(cfn_hash['local'][local][param]))
+                        locals.instance_locals.append(param+'='+str(cfn_hash['local'][cflocal][param]))
 
                     cfn_model.locals[param] = locals
 
@@ -667,20 +682,24 @@ class CfnParser:
             print("\n\n#############################################")
             print('The new resource object now has the following properties'+lineno())
             if hasattr(resource_object, 'policies'):
-                print(resource_object.policies)
+                print('policies: '+str(resource_object.policies))
 
             if hasattr(resource_object, 'policy_objects'):
-                print(resource_object.policy_objects)
+                print('policy objects: '+str(resource_object.policy_objects))
             if hasattr(resource_object, 'group_names'):
-                print(resource_object.group_names)
+                print('group names: '+str(resource_object.group_names))
             if hasattr(resource_object, 'groups'):
-                print(resource_object.groups)
+                print('groups: '+str(resource_object.groups))
             if hasattr(resource_object, 'resource_type'):
-                print(resource_object.resource_type)
+                print('resource type: '+str(resource_object.resource_type))
             if hasattr(resource_object, 'policy_document'):
-                print(resource_object.policy_document)
+                print('policy document: '+str(resource_object.policy_document))
             print(vars(resource_object))
             print("##################################################\n")
+
+        if self.debug:
+            print('resource_object dir: '+str(dir(resource_object))+lineno())
+            print('resource_object vars: '+str(vars(resource_object))+lineno())
 
 
 

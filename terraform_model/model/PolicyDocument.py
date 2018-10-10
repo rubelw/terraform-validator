@@ -25,7 +25,6 @@ class PolicyDocument:
 
         if self.debug:
             print('init'+lineno())
-        sys.exit(1)
 
     def wildcard_allowed_resources(self, debug=False):
         """
