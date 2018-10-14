@@ -73,4 +73,7 @@ class S3BucketPublicReadWriteAclRule(BaseRule):
       if self.debug:
         print('no violating_policies' + lineno())
 
+    if self.debug:
+      input('Press enter to continue: '+lineno())
+
     return logical_resource_ids

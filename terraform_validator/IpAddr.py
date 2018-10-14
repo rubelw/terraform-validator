@@ -23,14 +23,18 @@ class IpAddr:
             print("\ningress: "+str(ingress)+lineno())
             if hasattr(ingress,'__dict__'):
                 print('vars: '+str(vars(ingress))+lineno())
+                print('type:'+str(ingress)+lineno())
                 if inspect.isclass(ingress):
                     print(str(vars(ingress)))
 
         if type(ingress)== type(dict()):
             if debug:
                 print("\ningress is a dict"+lineno())
-            if ingress['CidrIp'] == '0.0.0.0/0':
-                return True
+
+            if type(ingress['cidr_blocks']) == type(list()):
+                for block in ingress['cidr_blocks']:
+                    if block == '0.0.0.0/0':
+                        return True
 
         elif type(ingress) == type(list()):
             if debug:
@@ -40,12 +44,15 @@ class IpAddr:
                 if debug:
                     print('item is: '+str(item)+lineno())
 
-                if 'CidrIp' in item and item['CidrIp'] == '0.0.0.0/0':
-                    return True
+                if type(ingress['cidr_blocks']) == type(list()):
+                    for block in ingress['cidr_blocks']:
+                        if block == '0.0.0.0/0':
+                            return True
 
         elif hasattr(ingress, 'cfn_model'):
             if debug:
-              print('ingress is object and has cfn_model attribute'+lineno())
+                print('ingress is object and has cfn_model attribute'+lineno())
+                print('model: '+str(ingress.cfn_model)+lineno())
 
             if hasattr(ingress.cfn_model, 'cfn_model'):
                 if debug:
@@ -75,32 +82,14 @@ class IpAddr:
                 if debug:
                     print("\n"+str(ingress.cfn_model)+lineno())
 
-                if type(ingress.cfn_model) == type(dict()):
+                if hasattr(ingress,'cidr_blocks'):
                     if debug:
-                        print("\ningress cfn model is a dict"+lineno())
+                        print('has cidr blocks '+lineno())
 
-                    if 'Properties' in ingress.cfn_model:
-                        if 'CidrIp' in ingress.cfn_model['Properties']:
-                            if type(ingress.cfn_model['Properties']['CidrIp']) == type(str()) and str(
-                                  ingress.cfn_model['Properties']['CidrIp']) == '0.0.0.0/0':
-                                return True
-
-                            if sys.version_info[0] < 3:
-                                if type(ingress.cfn_model['Properties']['CidrIp']) == type(unicode()) and str(
-                                      ingress.cfn_model['Properties']['CidrIp']) == '0.0.0.0/0':
-                                    return True
-
-                elif type(ingress.cfn_model)== type(list()):
-                    if debug:
-                        print("\ningress is a list"+lineno())
-
-                    for item in ingress.cfn_model:
-                        if debug:
-                            print(str(item)+lineno())
-
+                    for block in ingress.cidr_blocks:
+                        if block == '0.0.0.0/0':
+                            return True
                 else:
-                    if debug:
-                        print(str(vars(ingress.cfn_model))+lineno())
 
                     if hasattr(ingress.cfn_model,'cfn_model'):
                         if debug:

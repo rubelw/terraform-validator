@@ -147,12 +147,13 @@ class CfnParser:
             print("\n##################################################")
             print('properties wired into model element objects'+lineno())
             print("##################################################\n")
-
+            input('press enter to continue '+lineno())
 
         if self.debug:
             print("\n##################################################")
             print('Transforming hash into parameters'+lineno())
             print("##################################################\n")
+            input('press enter to continue '+lineno())
 
         # Transform cloudformation parameters into parameters object
         cfn_model = self.transform_hash_into_parameters(cloudformation_yml,cfn_model)
@@ -169,6 +170,29 @@ class CfnParser:
             print('raw model: '+str(cfn_model.raw_model)+lineno())
             print('Beginning post process resource model elements' + lineno())
             print("##################################################\n")
+
+
+            for r in cfn_model.resources:
+                print("############### RESOURCE INFO ###################")
+                print(r)
+                print('resource_type: '+str(cfn_model.resources[r].resource_type)+lineno())
+                print('logical_resource_id: '+str(cfn_model.resources[r].logical_resource_id)+lineno())
+                print('metadata: '+str(cfn_model.resources[r].metadata)+lineno())
+                print('vars: '+str(vars(cfn_model.resources[r]))+lineno())
+                print('raw model: '+str(cfn_model.resources[r].raw_model.raw_model)+lineno())
+                print("##################################################\n")
+
+                print('vars: '+str(vars(cfn_model))+lineno())
+
+            print('outputs: '+str(cfn_model.outputs)+lineno())
+            for output in cfn_model.outputs:
+                print(str(output)+lineno())
+                print(str(cfn_model.outputs[output])+lineno())
+                print('id: '+str(cfn_model.outputs[output].id)+lineno())
+                print('type: '+str(cfn_model.outputs[output].type)+lineno())
+
+
+
 
         # pass 2: tie together separate resources only where necessary to make life easier for rule logic
         cfn_model = self.post_process_resource_model_elements(cfn_model)
@@ -228,15 +252,27 @@ class CfnParser:
             'egress':'AWS::EC2::SecurityGroupEgress',
             'ingress':'AWS::EC2::SecurityGroupIngress',
             'aws_instance':'AWS::EC2::Instance',
-            'aws_iam_role':'AWS::IAM::Role'
+            'aws_iam_role':'AWS::IAM::Role',
+            'aws_iam_policy': 'AWS::IAM::Policy',
+            'aws_iam_user': 'AWS::IAM::User',
+            'aws_network_interface': 'AWS::EC2::NetworkInterface',
+            'aws_s3_bucket_policy': 'AWS::S3::BucketPolicy',
+            'aws_sqs_queue_policy': 'AWS::SQS::QueuePolicy',
+            'aws_iam_policy_attachment': 'AWS::IAM::ManagedPolicy'
         }
 
+
+        if self.debug:
+            print("\n##############################")
+            print("Iterating through each of the resources in the cfn model")
+            print("################################\n")
 
         for r in cfn_model.resources:
 
             if cfn_model.resources[r].resource_type not in resource_map:
-                print('fix cfnparser model map: '+lineno())
-                sys.exit(1)
+                #print('fix cfnparser model map: '+lineno())
+                #sys.exit(1)
+                return cfn_model
 
             if self.debug:
                 print("\n\n#######################################")
@@ -246,7 +282,8 @@ class CfnParser:
                 print('resource type: '+str(type(cfn_model.resources[r].resource_type))+lineno())
                 print('cfn_model type: '+str(cfn_model.resources[r].resource_type)+lineno())
 
-                print('parser registry:'+str(resource_parser_class.registry)+lineno())
+                #print('parser registry:'+str(resource_parser_class.registry)+lineno())
+
 
             # if there is a resource parser in the registry
             if resource_map[cfn_model.resources[r].resource_type] in resource_parser_class.registry:
@@ -269,6 +306,7 @@ class CfnParser:
 
                 resource_parser.parse(cfn_model, cfn_model.resources[r], debug=self.debug)
 
+
         if self.debug:
             print('done parsing the cfn model')
 
@@ -285,9 +323,11 @@ class CfnParser:
         :return: 
         """
         if self.debug:
+            print("\n#############################################################")
             print('CfnParser - transform_hash_into_model_elements'+lineno())
             print('hash: '+str(cfn_hash)+lineno())
             print('cfn_model: '+str(cfn_model)+lineno())
+            print("##############################################################\n")
 
         if type(cfn_hash) == type(str()):
             json_acceptable_string = cfn_hash.replace("'", "\"")
@@ -297,29 +337,35 @@ class CfnParser:
         for resource_type in cfn_hash['resource']:
 
             if self.debug:
+                print("\n##############################################")
                 print('resource_type: '+str(resource_type)+lineno())
+                print("interating over each of the resources in the resource type")
+                print("################################################\n")
+
 
             for resource_name in cfn_hash['resource'][resource_type]:
 
                 if self.debug:
+                    print("\n###############################################")
                     print('resource type: '+str(resource_type)+lineno())
                     print('resource name: '+str(resource_name)+lineno())
-                    input('enter'+lineno())
+                    print("#################################################\n")
 
                 # Create a new resource class based on the name of the resource
                 # Does this by getting the resource type, and creating object based on resource type
                 resource_class = self.class_from_type_name(resource_type,resource_name)
 
                 if self.debug:
+                    print("\n###########################################")
                     print('resource class: '+str(resource_class)+lineno())
-                    input('enter'+lineno())
-
+                    print("############################################\n")
                 # This is the original model
                 resource_class.raw_model= cfn_model
 
                 if self.debug:
+                    print("\n##########################################")
                     print('Setting logical resource id to: '+str(resource_name)+lineno())
-
+                    print("############################################")
                 resource_class.logical_resource_id = resource_name
 
                 resource_class.resource_type = resource_type
@@ -335,7 +381,6 @@ class CfnParser:
 
                 if self.debug:
                     print('There fields are no assigned to properties'+lineno())
-                    input('enter: '+lineno())
 
                 cfn_model.resources[resource_name]=resource_class
 
@@ -349,6 +394,18 @@ class CfnParser:
                     print('logical_resource_id: '+str(resource_class.logical_resource_id)+lineno())
                     print("##############################################################\n")
 
+        if self.debug:
+            print("\n#########################################")
+            print("Model is")
+            print('cfn model outputs:'+str(cfn_model.outputs)+lineno())
+            print('cfn model locals:'+str(cfn_model.locals)+lineno())
+            print('cfn model providers:'+str(cfn_model.providers)+lineno())
+            print('cfn model parameters: '+str(cfn_model.parameters)+lineno())
+            print('cfn model data:'+str(cfn_model.data)+lineno())
+            print('cfn model resources:' +str(cfn_model.resources)+lineno())
+            print('cfn model raw_model:'+str(cfn_model.raw_model)+lineno())
+
+            input('check model - press enter to continue: '+lineno())
 
         return cfn_model
 
@@ -364,7 +421,8 @@ class CfnParser:
             print('CfnParser - transform_hash_into_parameters'+lineno())
             print('cfn_hash: '+str(cfn_hash)+lineno())
             print('type hash: '+str(type(cfn_hash))+lineno())
-            print('cfn_model: '+str(cfn_model)+lineno())
+            print('cfn_model- raw model: '+str(cfn_model.raw_model)+lineno())
+
 
         if type(cfn_hash) == type(str()):
             json_acceptable_string = cfn_hash.replace("'", "\"")
@@ -387,6 +445,9 @@ class CfnParser:
 
                     if self.debug:
                         print('variable is: '+str(cfn_hash['variable'][variable])+lineno())
+                        print("\n#####################################")
+                        print("Iterating through each of the parameters in variable")
+                        print("#######################################\n")
 
                     for param in cfn_hash['variable'][variable]:
 
@@ -403,12 +464,15 @@ class CfnParser:
                                 print('no default parameter'+lineno())
 
                         if self.debug:
-                            print('adding parameter: '+str(param)+'='+str(cfn_hash['variable'][variable][param])+lineno())
+                            print('adding parameter: '+str(variable)+'='+str(cfn_hash['variable'][variable][param])+lineno())
 
                         parameter.instance_variables.append(param+'='+str(cfn_hash['variable'][variable][param]))
 
-                    cfn_model.parameters[param] = parameter
+                    cfn_model.parameters[variable] = parameter
 
+                if self.debug:
+                    print('cfn model parameters:'+str(cfn_model.parameters)+lineno())
+                    input('wiring variable: '+str(variable)+lineno())
 
         if 'data' in cfn_hash and cfn_hash['data']:
 
@@ -428,6 +492,9 @@ class CfnParser:
 
                     if self.debug:
                         print('data is: '+str(cfn_hash['data'][cfdata])+lineno())
+                        print("\n#####################################")
+                        print("Iterating through each of the parameters in data")
+                        print("#######################################\n")
 
                     for param in cfn_hash['data'][cfdata]:
 
@@ -445,11 +512,11 @@ class CfnParser:
                                 print('no default data'+lineno())
 
                         if self.debug:
-                            print('adding data: '+str(param)+'='+str(cfn_hash['data'][cfdata][param])+lineno())
+                            print('adding data: '+str(cfdata)+'='+str(cfn_hash['data'][cfdata][param])+lineno())
 
                         data.instance_data.append(param+'='+str(cfn_hash['data'][cfdata][param]))
 
-                    cfn_model.data[param] = cfdata
+                    cfn_model.data[cfdata] = cfdata
 
 
 
@@ -470,6 +537,9 @@ class CfnParser:
 
                     if self.debug:
                         print('local is: '+str(cfn_hash['local'][cflocal])+lineno())
+                        print("\n#####################################")
+                        print("Iterating through each of the parameters in locals")
+                        print("#######################################\n")
 
                     for param in cfn_hash['local'][cflocal]:
 
@@ -486,11 +556,11 @@ class CfnParser:
                                 print('no default local'+lineno())
 
                         if self.debug:
-                            print('adding local: '+str(param)+'='+str(cfn_hash['local'][cflocal][param])+lineno())
+                            print('adding local: '+str(cflocal)+'='+str(cfn_hash['local'][cflocal][param])+lineno())
 
                         locals.instance_locals.append(param+'='+str(cfn_hash['local'][cflocal][param]))
 
-                    cfn_model.locals[param] = locals
+                    cfn_model.locals[cflocal] = locals
 
 
         if 'output' in cfn_hash and cfn_hash['output']:
@@ -510,6 +580,11 @@ class CfnParser:
 
                     if self.debug:
                         print('output is: '+str(cfn_hash['output'][output])+lineno())
+                        print("\n#####################################")
+                        print("Iterating through each of the parameters in outputs")
+                        print("#######################################\n")
+
+
 
                     for param in cfn_hash['output'][output]:
 
@@ -526,11 +601,11 @@ class CfnParser:
                                 print('no default output'+lineno())
 
                         if self.debug:
-                            print('adding output: '+str(param)+'='+str(cfn_hash['output'][output][param])+lineno())
+                            print('adding output: '+str(output)+'='+str(cfn_hash['output'][output][param])+lineno())
 
                         outputs.instance_outputs.append(param+'='+str(cfn_hash['output'][output][param]))
 
-                    cfn_model.outputs[param] = outputs
+                    cfn_model.outputs[output] = outputs
 
 
 
@@ -551,6 +626,9 @@ class CfnParser:
 
                     if self.debug:
                         print('provider is: '+str(cfn_hash['provider'][provider])+lineno())
+                        print("\n#####################################")
+                        print("Iterating through each of the parameters in providers")
+                        print("#######################################\n")
 
                     for param in cfn_hash['provider'][provider]:
 
@@ -567,13 +645,11 @@ class CfnParser:
                                 print('no default provider'+lineno())
 
                         if self.debug:
-                            print('adding provider: '+str(param)+'='+str(cfn_hash['provider'][provider][param])+lineno())
+                            print('adding provider: '+str(provider)+'='+str(cfn_hash['provider'][provider][param])+lineno())
 
                         providers.instance_providers.append(param+'='+str(cfn_hash['provider'][provider][param]))
 
-                    cfn_model.providers[param] = providers
-
-
+                    cfn_model.providers[provider] = providers
 
         return cfn_model
 
@@ -758,9 +834,12 @@ class CfnParser:
         """
 
         if self.debug:
+            print("\n##################################################")
+            print('Getting the resource class')
             print('generate_resource_class_from_type'+lineno())
             print('cfn model: '+str(cfn_model)+lineno())
             print('type name: '+str(type_name)+lineno())
+            print("###################################################\n")
 
 
         models = [
@@ -786,10 +865,37 @@ class CfnParser:
             'aws_elb',
             'aws_security_group',
             'aws_security_group_rule',
-            'aws_iam_role'
+            'aws_iam_role',
+            'aws_iam_policy',
+            'aws_iam_user',
+            'aws_network_interface',
+            'egress',
+            'ingress',
+            'aws_iam_group',
+            'aws_s3_bucket_policy'
+            'aws_sqs_queue_policy',
+            'aws_iam_policy_attachment'
         ]
         module_name = 'AWS'
 
+        if type_name == 'aws_iam_policy_attachment':
+            short_name == 'IAMManagedPolicy'
+        if type_name == 'aws_sqs_queue_policy':
+            short_name == 'SQSQueuePolicy'
+        if type_name == 'aws_s3_bucket_policy':
+            short_name == 'S3BucketPolicy'
+        if type_name == 'aws_iam_group':
+            short_name == 'IAMGroup'
+        if type_name == 'egress':
+            short_name == 'EC2SecurityGroupEgress'
+        if type_name == 'ingress':
+            short_name == 'EC2SecurityGroupIngress'
+        if type_name == 'aws_network_interface':
+            short_name == 'EC2NetworkInterface'
+        if type_name == 'aws_iam_user':
+            short_name = 'IAMUser'
+        if type_name == 'aws_iam_policy':
+            short_name = 'IAMPolicy'
         if type_name == 'aws_instance':
             short_name ='EC2Instance'
         if type_name == 'aws_elb':
@@ -830,7 +936,17 @@ class CfnParser:
                 resource_class = getattr(sys.modules[__name__], short_name).__getattribute__(short_name)(cfn_model)
                 setattr(resource_class,'debug',self.debug)
 
+                if self.debug:
+                    print('vars: ' + str(vars(resource_class)) + lineno())
+
+
+
+
             else:
+
+                if self.debug:
+                    print('type: '+str(type_name)+' not a resource we are concered with.  Making generic model')
+
                 resource_class = ModelElement.ModelElement(cfn_model)
                 setattr(resource_class, '__name__', type_name)
                 setattr(resource_class,'debug',self.debug)
@@ -838,8 +954,7 @@ class CfnParser:
             print('unknown namespace in resource type'+lineno())
             sys.exit(1)
 
-        if self.debug:
-            print('vars: '+str(vars(resource_class))+lineno())
+
 
         return resource_class
 

@@ -87,4 +87,7 @@ class EbsVolumeHasSseRule(BaseRule):
             if self.debug:
                 print('no violating_volumes'+lineno())
 
+        if self.debug:
+            input('Press enter to continue: ' + lineno())
+
         return violating_volumes

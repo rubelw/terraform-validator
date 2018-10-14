@@ -43,7 +43,7 @@ class IamRoleParser:
             print('vars: '+str(vars(iam_role)))
 
         if iam_role.assume_role_policy:
-            iam_role.assume_role_policy_document  =document_parser.parse(iam_role.assume_role_policy)
+            iam_role.assume_role_policy_document  =document_parser.parse(cfn_model, iam_role.assume_role_policy)
 
 
         for policy in iam_role.policies:

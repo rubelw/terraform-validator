@@ -80,8 +80,14 @@ class IamRoleWildcardActionOnTrustPolicyRule(BaseRule):
                 print('has wildcard allowed actions')
 
               violating_roles.append(str(resource.logical_resource_id))
+            else:
+              if self.debug:
+                print('does not have wildcare allowed actions')
     else:
       if self.debug:
         print('no violating_roles'+lineno())
+
+    if self.debug:
+      input('Press enter to continue: '+lineno())
 
     return violating_roles

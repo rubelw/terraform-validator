@@ -69,4 +69,7 @@ class SecurityGroupMissingEgressRule(BaseRule):
         if self.debug:
             print('violations: '+str(list(set(logical_resource_ids)))+lineno())
 
+        if self.debug:
+            input('Press enter to continue: ' + lineno())
+
         return logical_resource_ids

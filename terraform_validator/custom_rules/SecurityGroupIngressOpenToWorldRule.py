@@ -97,4 +97,7 @@ class SecurityGroupIngressOpenToWorldRule(BaseRule):
                     print('ip4/6 address is open' + lineno())
                 violating_ingresses.append(str(standalone_ingress.logical_resource_id))
 
+        if self.debug:
+            input('Press enter to continue: ' + lineno())
+
         return violating_ingresses

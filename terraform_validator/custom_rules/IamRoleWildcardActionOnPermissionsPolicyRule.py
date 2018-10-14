@@ -90,4 +90,7 @@ class IamRoleWildcardActionOnPermissionsPolicyRule(BaseRule):
       if self.debug:
         print('no violating_roles' + lineno())
 
+    if self.debug:
+      input('Press enter to continue: '+lineno())
+
     return violating_roles

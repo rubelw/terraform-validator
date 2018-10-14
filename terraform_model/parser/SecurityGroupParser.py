@@ -4,6 +4,7 @@ import sys
 import inspect
 import re
 import sys
+import json
 from terraform_model.model.EC2SecurityGroupIngress import EC2SecurityGroupIngress
 from terraform_model.model.EC2SecurityGroupEgress import EC2SecurityGroupEgress
 from terraform_model.model.References import References
@@ -34,11 +35,16 @@ class SecurityGroupParser:
         security_group = SecurityGroupParser.objectify_egress(cfn_model, security_group, debug=debug)
         security_group = SecurityGroupParser.objectify_ingress(cfn_model, security_group, debug=debug)
 
+
         if debug:
-            print('objectified egress'+lineno())
+            print("\n###############################")
+            print('objectified egress and ingress'+lineno())
+            print('staring to wire ingress rules to security group'+lineno())
+            print("#################################\n")
 
         security_group = SecurityGroupParser.wire_ingress_rules_to_security_group(cfn_model, security_group, debug=debug)
         security_group = SecurityGroupParser.wire_egress_rules_to_security_group(cfn_model, security_group, debug=debug)
+
 
         return security_group
 
@@ -60,90 +66,100 @@ class SecurityGroupParser:
                 print('security group: '+str(security_group)+lineno())
                 print('type: '+str(type(security_group))+lineno())
                 print('vars: '+str(vars(security_group))+lineno())
+                print('security group raw model: '+str(security_group.raw_model)+lineno())
                 print('###########################\n\n')
 
-            if 'Properties' in security_group.cfn_model:
+
+            # If there is a ingress in properties
+            if security_group.ingress:
 
                 if debug:
-                    print('there are properties in the security group cfn model'+lineno())
+                    print('has securitygroupingress property'+lineno())
+                    print('type: '+str(type(security_group.ingress))+lineno())
 
-                # If there is a ingress in properties
-                if 'SecurityGroupIngress' in security_group.cfn_model['Properties']:
+
+                if type(security_group.ingress) == type(str()):
+                    json_acceptable_string = security_group.ingress.replace("'", "\"")
+                    security_group.ingress= json.loads(json_acceptable_string)
+
+
+                if debug:
+                    print('security group ingress is now: '+str(security_group.ingress)+lineno())
+
+                # if the ingress is a list
+                if type(security_group.ingress) == type(list()):
+                    if debug:
+                        print('is a list'+lineno())
 
                     if debug:
-                        print('has securitygroupingress property'+lineno())
-                        print('type: '+str(type(security_group.cfn_model['Properties']['SecurityGroupIngress']))+lineno())
-
-                    # if the ingress is a list
-                    if type(security_group.cfn_model['Properties']['SecurityGroupIngress']) == type(list()):
+                        print('Iterating over each list in array'+lineno())
+                    # Iterate over each sg in array
+                    for sg in security_group.ingress:
                         if debug:
-                            print('is a list'+lineno())
+                            print(str(sg)+lineno())
 
-                        if debug:
-                            print('Iterating over each list in array'+lineno())
-                        # Iterate over each sg in array
-                        for sg in security_group.cfn_model['Properties']['SecurityGroupIngress']:
-                            if debug:
-                                print(str(sg)+lineno())
-
-                            ingress_object = EC2SecurityGroupIngress(cfn_model,debug=debug)
-                            ingress_object.logical_resource_id = security_group.logical_resource_id
-
-                            for key in sg:
-                                if debug:
-                                    print('key: '+str(key)+lineno())
-                                    print('value: '+str(sg[key])+lineno())
-
-                                if '::' in key:
-                                    if debug:
-                                        print(':: in key'+lineno())
-                                    continue
-                                else:
-                                    if debug:
-                                        print(':: not in key '+lineno())
-                                    new_key_name = SecurityGroupParser.initialLower(key)
-
-                                    if debug:
-                                        print('new key name: '+str(new_key_name)+lineno())
-                                    setattr(ingress_object,SecurityGroupParser.initialLower(key),sg[key])
-
-                            if debug:
-                                print(str(vars(ingress_object))+lineno())
-
-                            security_group.ingresses.append(ingress_object)
-
-                        if debug:
-                            print('Done iterating of list - returning security group to caller '+lineno())
-
-                        return security_group
-
-                    # If the ingress routes is a dictionary
-                    elif type(security_group.cfn_model['Properties']['SecurityGroupIngress']) == type(dict()):
-                        if debug:
-                            print('is a dict'+lineno())
-                            print(str(security_group.cfn_model['Properties']['SecurityGroupIngress'])+lineno())
-
-
-                        ingress_object = EC2SecurityGroupIngress(cfn_model)
+                        ingress_object = EC2SecurityGroupIngress(cfn_model,debug=debug)
                         ingress_object.logical_resource_id = security_group.logical_resource_id
 
-                        # Iterate over each key-value pair in dictionary and associate
-                        # to an object attribute
-                        for key in security_group.cfn_model['Properties']['SecurityGroupIngress']:
+                        for key in sg:
                             if debug:
-                                print('key: ' + str(key) + lineno())
-                                print('value: ' + str(security_group.cfn_model['Properties']['SecurityGroupIngress'][key]) + lineno())
+                                print('key: '+str(key)+lineno())
+                                print('value: '+str(sg[key])+lineno())
 
-                            setattr(ingress_object, SecurityGroupParser.initialLower(key), security_group.cfn_model['Properties']['SecurityGroupIngress'][key])
+                            if '::' in key:
+                                if debug:
+                                    print(':: in key'+lineno())
+                                continue
+                            else:
+                                if debug:
+                                    print(':: not in key '+lineno())
+                                new_key_name = SecurityGroupParser.initialLower(key)
+
+                                if debug:
+                                    print('new key name: '+str(new_key_name)+lineno())
+                                setattr(ingress_object,SecurityGroupParser.initialLower(key),sg[key])
+
+                        if debug:
+                            print(str(vars(ingress_object))+lineno())
 
                         security_group.ingresses.append(ingress_object)
-                        return security_group
 
-                    # if the ingress is a list
-                    else:
-                        print('security group ingress is not a list or dict')
-                        print(str('type: ')+str(type(security_group.cfn_model['Properties']['SecurityGroupIngress'])+lineno()))
-                        sys.exit(1)
+                    if debug:
+                        print('Done iterating of list - returning security group to caller '+lineno())
+
+                    return security_group
+
+                # If the ingress routes is a dictionary
+                elif type(security_group.ingress) == type(dict()):
+
+                    # example: security_group.ingress
+                    # example: {'from_port': 0, 'to_port': 65535, 'protocol': 'TCP', 'cidr_blocks': ['${var.cidr_blocks}']}
+
+                    if debug:
+                        print('is a dict'+lineno())
+                        print(str(security_group.ingress)+lineno())
+
+
+                    ingress_object = EC2SecurityGroupIngress(cfn_model)
+                    ingress_object.logical_resource_id = security_group.logical_resource_id
+
+                    # Iterate over each key-value pair in dictionary and associate
+                    # to an object attribute
+                    for key in security_group.ingress:
+                        if debug:
+                            print('key: ' + str(key) + lineno())
+                            print('value: ' + str(security_group.ingress[key]) + lineno())
+
+                        setattr(ingress_object, SecurityGroupParser.initialLower(key), security_group.ingress[key])
+
+                    security_group.ingresses.append(ingress_object)
+                    return security_group
+
+                # if the ingress is a list
+                else:
+                    print('security group ingress is not a list or dict')
+                    print(str('type: ')+str(type(security_group.ingress)+lineno()))
+                    sys.exit(1)
 
     @staticmethod
     def objectify_egress(cfn_model, security_group, debug=False):
@@ -167,102 +183,104 @@ class SecurityGroupParser:
                 print('there is a security group'+lineno())
                 print('security group: '+str(security_group)+lineno())
                 print('vars: '+str(vars(security_group))+lineno())
+                print('model: '+str(security_group.cfn_model)+lineno())
                 print("###########################################\n")
 
-            if 'Properties' in security_group.cfn_model:
+
+            print(str(security_group.logical_resource_id)+lineno())
+            print(str(security_group.egress)+lineno())
+            if security_group.egress:
+                print(str(security_group.egress)+lineno())
+
+
+            # If there is a egress property
+            if security_group.egress:
+
+                if type(security_group.egress) == type(str()):
+                    json_acceptable_string = security_group.egress.replace("'", "\"")
+                    security_group.egress= json.loads(json_acceptable_string)
 
                 if debug:
-                    print('there are properties in the security group cfn model' + lineno())
+                    print('has securitygroupegress property'+lineno())
+                    print('type: '+str(type(security_group.egress))+lineno())
 
-                # If there is a egress property
-                if 'SecurityGroupEgress' in security_group.cfn_model['Properties']:
-
+                # If the egress is an array
+                if type(security_group.egress) == type(list()):
                     if debug:
-                        print('has securitygroupegress property'+lineno())
-                        print('type: '+str(type(security_group.cfn_model['Properties']['SecurityGroupEgress']))+lineno())
+                        print('is a list'+lineno())
 
-                    # If the egress is an array
-                    if type(security_group.cfn_model['Properties']['SecurityGroupEgress']) == type(list()):
+                    for sg in security_group.egress:
                         if debug:
-                            print('is a list'+lineno())
+                            print(str(sg)+lineno())
 
-                        for sg in security_group.cfn_model['Properties']['SecurityGroupEgress']:
-                            if debug:
-                                print(str(sg)+lineno())
-
-                            egress_object = EC2SecurityGroupEgress(cfn_model,debug=debug)
-                            egress_object.logical_resource_id = security_group.logical_resource_id
-
-                            for key in sg:
-                                if debug:
-                                    print('key: '+str(key)+lineno())
-                                    print('value: '+str(sg[key])+lineno())
-
-                                if '::' in key:
-                                    continue
-
-                                else:
-                                    if debug:
-                                        print(':: not in key '+lineno())
-                                    new_key_name = SecurityGroupParser.initialLower(key)
-
-                                    if debug:
-                                        print('new key name: '+str(new_key_name)+lineno())
-
-                                    setattr(egress_object,SecurityGroupParser.initialLower(key),sg[key])
-
-                            if debug:
-                                print(str(vars(egress_object))+lineno())
-
-                        security_group.egresses.append(egress_object)
-
-                        return security_group
-
-                    # If the egress is a dictionary
-                    elif type(security_group.cfn_model['Properties']['SecurityGroupEgress']) == type(dict()):
-
-                        if debug:
-                            print('is a dict'+lineno())
-                            print(str(security_group.cfn_model['Properties']['SecurityGroupEgress'])+lineno())
-                        # {'CidrIp': '10.1.2.3/32', 'FromPort': 34, 'ToPort': 36, 'IpProtocol': 'tcp'}
-
-                        egress_object = EC2SecurityGroupIngress(cfn_model)
+                        egress_object = EC2SecurityGroupEgress(cfn_model,debug=debug)
                         egress_object.logical_resource_id = security_group.logical_resource_id
 
-                        # Iterate over each key-value pair in the dictionary and create
-                        # an object attribute
-                        for key in security_group.cfn_model['Properties']['SecurityGroupEgress']:
+                        for key in sg:
                             if debug:
-                                print('key: ' + str(key) + lineno())
-                                print('value: ' + str(security_group.cfn_model['Properties']['SecurityGroupEgress'][key]) + lineno())
+                                print('key: '+str(key)+lineno())
+                                print('value: '+str(sg[key])+lineno())
 
-                            matchObj = re.match(r'::', key, re.M | re.I)
-
-                            if matchObj:
-                                if debug:
-                                    print("matchObj.group() : ", matchObj.group() + lineno())
+                            if '::' in key:
                                 continue
+
                             else:
                                 if debug:
-                                    print("No match!!" + lineno())
+                                    print(':: not in key '+lineno())
+                                new_key_name = SecurityGroupParser.initialLower(key)
 
-                                setattr(egress_object, SecurityGroupParser.initialLower(key), security_group.cfn_model['Properties']['SecurityGroupEgress'][key])
+                                if debug:
+                                    print('new key name: '+str(new_key_name)+lineno())
+
+                                setattr(egress_object,SecurityGroupParser.initialLower(key),sg[key])
 
                         if debug:
-                            print(str(vars(egress_object)) + lineno())
+                            print(str(vars(egress_object))+lineno())
 
-                        security_group.egresses.append(egress_object)
-                        return security_group
+                    security_group.egresses.append(egress_object)
 
-                    else:
-                        print("\n#############################")
-                        print('Security group is not egress')
-                        print("################################\n")
+                    return security_group
 
-            else:
+                # If the egress is a dictionary
+                elif type(security_group.egress) == type(dict()):
 
-                if debug:
-                    print('no properties in security group'+lineno())
+                    if debug:
+                        print('is a dict'+lineno())
+                        print(str(security_group.egress)+lineno())
+                    # {'CidrIp': '10.1.2.3/32', 'FromPort': 34, 'ToPort': 36, 'IpProtocol': 'tcp'}
+
+                    egress_object = EC2SecurityGroupIngress(cfn_model)
+                    egress_object.logical_resource_id = security_group.logical_resource_id
+
+                    # Iterate over each key-value pair in the dictionary and create
+                    # an object attribute
+                    for key in security_group.egress:
+                        if debug:
+                            print('key: ' + str(key) + lineno())
+                            print('value: ' + str(security_group.egress[key]) + lineno())
+
+                        matchObj = re.match(r'::', key, re.M | re.I)
+
+                        if matchObj:
+                            if debug:
+                                print("matchObj.group() : ", matchObj.group() + lineno())
+                            continue
+                        else:
+                            if debug:
+                                print("No match!!" + lineno())
+
+                            setattr(egress_object, SecurityGroupParser.initialLower(key), security_group.egress[key])
+
+                    if debug:
+                        print(str(vars(egress_object)) + lineno())
+
+                    security_group.egresses.append(egress_object)
+                    return security_group
+
+                else:
+                    print("\n#############################")
+                    print('Security group is not egress')
+                    print("################################\n")
 
         else:
             if debug:
@@ -300,6 +318,10 @@ class SecurityGroupParser:
             print('vars: '+str(vars(cfn_model))+lineno())
 
         if not security_group:
+
+            if self.debug:
+                print('there is not a security group returning'+lineno())
+
             return security_group
 
         # Get all the EC2::SecurityGroupIngress resources
@@ -314,16 +336,18 @@ class SecurityGroupParser:
                 print('security_group_ingress: '+str(security_group_ingress)+lineno())
                 print('vars: '+str(vars(security_group_ingress))+lineno())
                 print('dirs: '+str(dir(security_group_ingress))+lineno())
+                if security_group.ingress:
+                    print('ingress: '+str(security_groupingress.ingress)+lineno())
                 print("##############################################################\n")
 
-            if 'Properties' in security_group_ingress.cfn_model:
+            if security_group_ingress.ingress:
                 if debug:
                     print('security group ingress cfn model has properties'+lineno())
-                if 'GroupId' in security_group_ingress.cfn_model['Properties']:
+                if security_group_ingress.logical_resource_id:
                     if debug:
-                        print('security group ingress has groupid '+str(security_group_ingress.cfn_model['Properties']['GroupId'])+lineno())
+                        print('security group ingress has groupid '+str(security_group_ingress.logical_resource_id)+lineno())
 
-                    group_id = References.resolve_security_group_id(security_group_ingress.cfn_model['Properties']['GroupId'],debug=debug)
+                    group_id = References.resolve_security_group_id(security_group_ingress.logical_resource_id,debug=debug)
                     if debug:
                         print('group id: '+str(group_id)+lineno())
                         print('security group logical resource id: '+str(security_group_ingress.logical_resource_id)+lineno())
@@ -334,17 +358,8 @@ class SecurityGroupParser:
 
                     # If the group id in the standalone ingress matches the logical resource id
                     # of the actual security group
-                    if security_group.logical_resource_id == group_id:
-
-                        if debug:
-                            print('security group logical resourceid and group id are equal'+lineno())
-
-                        if not hasattr(security_group,'ingresses'):
-                            print('security group does not have ingresses array attribute'+lineno())
-                            print('vars: '+str(security_group_ingress))
-                            sys.exit(1)
-                        else:
-                            security_group.ingresses.append(security_group_ingress)
+                    if security_group_ingress.ingress:
+                        security_group.ingresses.append(security_group_ingress)
 
                 else:
                     print('Security group ingress has no groupid')
@@ -373,26 +388,38 @@ class SecurityGroupParser:
 
         if not security_group:
             return security_group
+        else:
+            if debug:
+                print("\n#############################")
+                print('There is a security group')
+                print("###############################\n")
 
-        egress_rules = cfn_model.resources_by_type('AWS::EC2::SecurityGroupEgress')
+        #egress_rules = cfn_model.resources_by_type('AWS::EC2::SecurityGroupEgress')
+        egress_rules = cfn_model.resources_by_type('AWS::EC2::SecurityGroup')
+
+        if debug:
+            print('egress rules: '+str(egress_rules)+lineno())
 
         # Iterate over each of the egress resources
         for security_group_egress in egress_rules:
 
             if debug:
                 print("\n\n###########################################################")
-                print('Standalone ingress resource')
-                print('security_group_ingress: '+str(security_group_egress)+lineno())
+                print('Standalone egress resource')
+                print('security_group_egress: '+str(security_group_egress)+lineno())
                 print('vars: '+str(vars(security_group_egress))+lineno())
                 print('dirs: '+str(dir(security_group_egress))+lineno())
+                if security_group.egress:
+                    print('egress: '+str(security_group.egress)+lineno())
                 print("##############################################################\n")
 
-            if 'Properties' in security_group_egress.cfn_model:
+            if security_group_egress.egress:
                 print('security group egress cfn model has properties'+lineno())
-                if 'GroupId' in security_group_egress.cfn_model['Properties']:
-                    print('security group ingress has groupid '+str(security_group_egress.cfn_model['Properties']['GroupId'])+lineno())
 
-                    group_id = References.resolve_security_group_id(security_group_egress.cfn_model['Properties']['GroupId'],debug=debug)
+                if security_group_egress.logical_resource_id:
+                    print('security group ingress has groupid '+str(security_group_egress.logical_resource_id)+lineno())
+
+                    group_id = References.resolve_security_group_id(security_group_egress.logical_resource_id,debug=debug)
                     if debug:
                         print('group id: '+str(group_id)+lineno())
                         print('security group logical resource id: '+str(security_group_egress.logical_resource_id)+lineno())
@@ -403,16 +430,8 @@ class SecurityGroupParser:
 
                     # If the group id in the standalone egress matches the logical resource id
                     # of the actual security group
-                    if security_group.logical_resource_id == group_id:
+                    if security_group_egress.egress:
+                        security_group.egresses.append(security_group_egress)
 
-                        if debug:
-                            print('security group logical resourceid and group id are equal'+lineno())
-
-                        if not hasattr(security_group,'egresses'):
-                            print('security group does not have egresses array attribute'+lineno())
-                            print('vars: '+str(security_group_egress))
-                            sys.exit(1)
-                        else:
-                            security_group.egresses.append(security_group_egress)
 
         return security_group

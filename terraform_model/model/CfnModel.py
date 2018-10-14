@@ -169,19 +169,31 @@ class CfnModel:
             print('CfnModel - resource_by_type'+lineno())
             print("\n\n####################################")
             print('#### Looking for resource_type: '+str(resource_type)+' in raw_model'+lineno())
+            print('#### raw model: '+str(self.raw_model)+lineno())
             print("####################################\n\n")
+
+        original_resource_type = resource_type
 
         resource_map = {
             'AWS::ElasticLoadBalancing::LoadBalancer':'aws_elb',
             'AWS::EC2::SecurityGroup':'aws_security_group',
-            'AWS::EC2::SecurityGroupEgress':'egress',
-            'AWS::EC2::SecurityGroupIngress':'ingress',
             'AWS::EC2::Instance':'aws_instance',
-            'AWS::IAM::Role': 'aws_iam_role'
+            'AWS::IAM::Role': 'aws_iam_role',
+            "AWS::IAM::Policy": 'aws_iam_policy',
+            "AWS::IAM::User": 'aws_iam_user',
+            "AWS::EC2::NetworkInterface": 'aws_network_interface',
+            "AWS::IAM::Group": 'aws_iam_group',
+            "AWS::S3::BucketPolicy": 'aws_s3_bucket_policy',
+            "AWS::SQS::QueuePolicy":'aws_sqs_queue_policy',
+            "AWS::IAM::ManagedPolicy":'aws_iam_policy_attachment'
         }
 
         if resource_type in resource_map:
             resource_type = resource_map[resource_type]
+
+        if self.debug:
+            print('trying to find: '+str(resource_type)+lineno())
+            input('enter'+lineno())
 
         resources = []
 
@@ -191,12 +203,14 @@ class CfnModel:
         # Iterating through the resources in the raw_model
         for resource in self.resources:
             if self.debug:
+                print("\n################# Resource Details ########################")
                 print('resource: '+str(resource)+lineno())
                 print('resource object: '+str(self.resources[resource])+lineno())
 
                 print('type: '+str(self.resources[resource].resource_type)+lineno())
                 print('vars: '+str(vars(self.resources[resource]))+lineno())
                 print('resource type is: '+str(self.resources[resource].resource_type)+lineno())
+                print("############################################################\n")
 
             if str(self.resources[resource].resource_type) == str(resource_type):
                 if self.debug:

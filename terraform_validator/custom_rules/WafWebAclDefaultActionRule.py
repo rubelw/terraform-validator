@@ -76,4 +76,7 @@ class WafWebAclDefaultActionRule(BaseRule):
       if self.debug:
         print('no violating_web_acls' + lineno())
 
+    if self.debug:
+      input('Press enter to continue: '+lineno())
+
     return violating_web_acls

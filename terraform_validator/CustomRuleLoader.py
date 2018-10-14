@@ -286,9 +286,9 @@ class CustomRuleLoader:
 
         if hasattr(resource, 'metadata'):
             if resource.metadata:
-                if 'cfn_nag' in resource.metadata:
-                    if 'rules_to_suppres' in resource.metadata['cfn_nag']:
-                        return resource.metadata['cfn_nag']['rules_to_suppress']
+                if 'cfn_validator' in resource.metadata:
+                    if 'rules_to_suppress' in resource.metadata['cfn_validator']:
+                        return resource.metadata['cfn_validator']['rules_to_suppress']
         else:
             if self.debug:
                 print('no rules to suppress'+str(lineno()))
@@ -368,12 +368,16 @@ class CustomRuleLoader:
         # If we are allowing suppression of certain rules
         else:
             if self.debug:
+                print("\n####################################")
+                print('Iterating through resources in cf model '+lineno())
                 print('allow suppression '+lineno())
                 print('suppression is: '+str(allow_suppression))
+                print("#######################################\n")
             cfn_model = copy.copy(cfn_model)
+
             for resource in cfn_model.resources:
                 if self.debug:
-                    print(str(resource)+lineno())
+                    print("resource name: "+str(resource)+lineno())
 
                 rules_to_suppress = self.rules_to_suppress(cfn_model.resources[resource])
 

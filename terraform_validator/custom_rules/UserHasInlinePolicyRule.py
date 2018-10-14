@@ -68,4 +68,7 @@ class UserHasInlinePolicyRule(BaseRule):
                   if len(user.policy_objects)>0:
                       violating_users.append(str(user.logical_resource_id))
 
+      if self.debug:
+          input('Press enter to continue: ' + lineno())
+
       return violating_users

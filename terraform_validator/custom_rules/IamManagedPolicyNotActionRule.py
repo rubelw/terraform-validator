@@ -86,4 +86,8 @@ class IamManagedPolicyNotActionRule(BaseRule):
 
         if self.debug:
             print('returning violating policies to'+lineno())
+
+        if self.debug:
+            input('Press enter to continue: ' + lineno())
+
         return violating_policies

@@ -2,6 +2,7 @@ from __future__ import absolute_import, division, print_function
 import sys
 import inspect
 import json
+import re
 from terraform_model.model.PolicyDocument import PolicyDocument
 from terraform_model.model.Statement import Statement
 
@@ -26,7 +27,7 @@ class PolicyDocumentParser:
         if self.debug:
             print('ParserError - init'+lineno())
 
-    def parse(self, raw_policy_document):
+    def parse(self, cfn_model, raw_policy_document):
 
         if self.debug:
             print("\n\n################################")
@@ -37,8 +38,62 @@ class PolicyDocumentParser:
 
         policy_document = PolicyDocument(debug=self.debug)
 
+        if self.debug:
+            print('have policy document: '+lineno())
+
+        if type(policy_document) == type(str()):
+            if self.debug:
+                print('policy document is a string: '+lineno())
+
+            json_acceptable_string = policy_document.replace("'", "\"")
+            policy_document= json.loads(json_acceptable_string)
+
 
         if type(raw_policy_document) == type(str()):
+            if self.debug:
+                print('raw policy document is a string: '+lineno())
+
+            matchObj = re.match(r'(.*)(\${)([^}]+)(})(.*)', raw_policy_document, re.M | re.I)
+
+            if matchObj:
+                prefix = str(matchObj.group(1))
+                lookup = str(matchObj.group(3))
+                suffix=str(matchObj.group(5))
+
+                if self.debug:
+                    print('prefix: '+str(prefix)+lineno())
+                    print('lookup: '+str(lookup)+lineno())
+                    print('suffix: '+str(suffix)+lineno())
+
+                parts = lookup.split('.')
+
+                if self.debug:
+                    print('parts: '+str(parts)+lineno())
+                    print('cfn model - raw model: '+str(cfn_model.raw_model)+lineno())
+
+                for i in range(len(parts)):
+
+                    if parts[i] in cfn_model.raw_model:
+                        if self.debug:
+                            print('part '+str(i)+' '+str(parts[i])+' in cfn model')
+
+                        if parts[i+1] in cfn_model.raw_model[parts[i]]:
+                            if self.debug:
+                                print('part ' + str(i+1) + ' ' + str(parts[i+1]) + ' in cfn model')
+
+                            if parts[i+2] in cfn_model.raw_model[parts[i]][parts[i+1]]:
+                                if self.debug:
+                                    print('part ' + str(i + 2) + ' ' + str(parts[i + 2]) + ' in cfn model')
+
+                                raw_policy_document= str(prefix)+str(cfn_model.raw_model[parts[i]][parts[i+1]][parts[i+2]])+str(suffix)
+
+                                if self.debug:
+                                    print('new raw policy is: '+str(raw_policy_document)+lineno())
+
+                                break
+
+
+
             json_acceptable_string = raw_policy_document.replace("'", "\"")
             raw_policy_document= json.loads(json_acceptable_string)
 

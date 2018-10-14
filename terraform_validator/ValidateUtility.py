@@ -258,15 +258,15 @@ class ValidateUtility:
 
 
             if not self.suppress_errors:
-                print("\nEvaluating: "+str(template))
+                print("\nEvaluating: "+str(template)+lineno())
 
             json_matchObj = re.match(r'.*.json$', template, re.M | re.I)
             tf_matchObj = re.match(r'.*.tf$',template, re.M | re.I)
 
 
             if self.debug:
-                print('json matchobj: '+str(json_matchObj))
-                print('tf matchobj: '+str(tf_matchObj))
+                print('json matchobj: '+str(json_matchObj)+lineno())
+                print('tf matchobj: '+str(tf_matchObj)+lineno())
 
             if json_matchObj:
 
@@ -302,7 +302,9 @@ class ValidateUtility:
                         print("######################################\n")
                     try:
 
-                        data = str(json.dumps(hcl.load(myfile))).strip()
+                        data = hcl.load(myfile)
+                        #print('tempdata: '+str(temp_data))
+                        #data = str(json.dumps(temp_data)).strip()
 
                         file_data = self.merge_dicts(file_data,data)
 
@@ -310,28 +312,6 @@ class ValidateUtility:
                         if self.debug:
                             print('data is: '+str(data)+lineno())
 
-                        #if data.startswith('{'):
-                        #    if self.debug:
-                        #        print('data starts with bracket'+lineno())
-                        #    data = data[1:]
-
-                        #    if self.debug:
-                        #        print('data is now: '+str(data)+lineno())
-
-
-                        #if data.endswith('}'):
-                        #    if self.debug:
-                        #        print('data ends with bracket'+lineno())
-                        #    data = data[:-1]
-                        #    if self.debug:
-                        #        print('data is now: '+str(data)+lineno())
-
-                        if self.debug:
-                            print('data is now: '+str(data)+lineno())
-
-                        #file_data = file_data + data+','
-                        if self.debug:
-                            print('file data: '+str(file_data)+lineno())
 
                     except Exception as e:
                         print("\n##############################")

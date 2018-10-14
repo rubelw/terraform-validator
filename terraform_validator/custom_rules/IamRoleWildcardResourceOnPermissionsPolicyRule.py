@@ -78,8 +78,9 @@ class IamRoleWildcardResourceOnPermissionsPolicyRule(BaseRule):
 
         if hasattr(resource, 'policy_objects'):
           if self.debug:
-            print('has policy obects ' + lineno())
+            print("\n"+'resource has policy obects ' + lineno())
             print('vars:'+str(resource.policy_objects)+lineno())
+            print("\n")
 
           if resource.policy_objects:
 
@@ -100,5 +101,8 @@ class IamRoleWildcardResourceOnPermissionsPolicyRule(BaseRule):
     else:
       if self.debug:
         print('no violating_roles'+lineno())
+
+    if self.debug:
+      input('Press enter to continue: '+lineno())
 
     return violating_roles
