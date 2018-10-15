@@ -9,7 +9,7 @@ __all__ = [
     'rules_set_registry'
 ]
 __title__ = 'terraform_validator'
-__version__ = '0.6.39'
+__version__ = '0.6.40'
 __author__ = 'Will Rubel'
 __author_email__ = 'willrubel@gmail.com'
 

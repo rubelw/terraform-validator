@@ -121,13 +121,13 @@ Options:
 Validate a file
 
 ``` {.sourceCode .console}
-$tf-validator validate -f terraform_distribution_without_logging.json
+$tf-validator validate -t /tmp
 
-Evaluating: terraform_distribution_without_logging.json
+Evaluating: terraform_distribution_without_logging.tf
 [
     {
         'failure_count': '0',
-        'filename': 'terraform_distribution_without_logging.json',
+        'filename': '/tmp/terraform_distribution_without_logging.tf',
         'file_results': [
             {
                 'id': 'W10',
@@ -155,7 +155,7 @@ Programmatically call tf-validator to analyze a file
 from terraform_validator.ValidateUtility import ValidateUtility
 
 config_dict = {}
-config_dict['template_file'] = '/tmp/template.json'
+config_dict['template_file'] = '/tmp/template.tf'
 validator = ValidateUtility(config_dict)
 real_result =  validator.validate()
 print(real_result)
@@ -163,7 +163,7 @@ print(real_result)
 [
     {
         'failure_count': '0',
-        'filename': '/tmp/template.json',
+        'filename': '/tmp/template.tf',
         'file_results': [
             {
                 'id': 'W1',
@@ -186,7 +186,7 @@ from terraform_validator.ValidateUtility import ValidateUtility
 
 config_dict = {}
 config_dict['suppress_errors'] = True
-config_dict['template_file'] = '/tmp/template.json'
+config_dict['template_file'] = '/tmp/template.tf'
 validator = ValidateUtility(config_dict)
 real_result =  validator.validate()
 print(real_result)
@@ -194,7 +194,7 @@ print(real_result)
 [
     {
         'failure_count': '0',
-        'filename': '/tmp/template.json',
+        'filename': '/tmp/template.tf',
         'file_results': [
             {
                 'id': 'W1',
@@ -364,7 +364,7 @@ class Ec2CustomTagsRule(BaseRule):
     return violating_volumes
 ```
 
--   Test the rule by creating a cloudformation template without the
+-   Test the rule by creating a terraform template without the
     necessary tags and testing
 
 ``` {.sourceCode .console}
@@ -412,7 +412,7 @@ tf-validator validate --template-path test/ --rules-directory=/home/user/custom_
 ``` {.sourceCode .console}
 {
     'failure_count': '1',
-    'filename': '/tmp/template.json',
+    'filename': '/tmp/template.tf',
     'file_results': [
         {
             'id': 'F86',
@@ -481,7 +481,7 @@ tf-validator validate --template-path test/ --rules-directory=/home/user/custom_
 ``` {.sourceCode .console
 {
 'failure_count': '0',
-'filename': '/tmp/template.json',
+'filename': '/tmp/template.tf',
 'file_results': [
 {
 'id': 'W1',
