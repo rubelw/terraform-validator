@@ -41,6 +41,16 @@ class PolicyDocumentParser:
         if self.debug:
             print('have policy document: '+lineno())
 
+
+        if type(raw_policy_document) == type(str()):
+
+            if self.debug:
+                print('raw policy: '+str(raw_policy_document)+lineno())
+            json_acceptable_string = raw_policy_document.replace("'", "\"")
+            raw_policy_document= json.loads(json_acceptable_string)
+
+
+
         if type(policy_document) == type(str()):
             if self.debug:
                 print('policy document is a string: '+lineno())

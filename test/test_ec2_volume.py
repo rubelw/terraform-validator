@@ -71,7 +71,7 @@ class TestEc2Volume(unittest.TestCase):
       expected_result = pretty(expected_result)
 
       template_name = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+'/terraform_validator/test_templates/tf/ec2_volume/ebs_volume_with_encryption.tf'
-      debug = False
+      debug = True
 
       config_dict = {}
       config_dict['template_file'] = template_name
@@ -93,8 +93,6 @@ class TestEc2Volume(unittest.TestCase):
       print('real results: ' + str(real_result))
 
       self.assertEqual(expected_result, real_result)
-
-
 
 
     def test_ec2_volumen_without_encryption(self):
@@ -155,7 +153,7 @@ class TestEc2Volume(unittest.TestCase):
       expected_result = pretty(expected_result)
 
       template_name = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+'/terraform_validator/test_templates/tf/ec2_volume/two_ebs_volumes_with_no_encryption.tf'
-      debug = False
+      debug = True
 
       config_dict = {}
       config_dict['template_file'] = template_name
@@ -171,9 +169,6 @@ class TestEc2Volume(unittest.TestCase):
       validator = class_to_test(config_dict)
 
       real_result =  validator.validate()
-
-
-
 
       self.maxDiff = None
 

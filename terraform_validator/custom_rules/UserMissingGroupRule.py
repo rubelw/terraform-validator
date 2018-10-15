@@ -74,8 +74,6 @@ class UserMissingGroupRule(BaseRule):
 
                     logical_resource_ids.append(str(user.logical_resource_id))
 
-        if self.debug:
-            input('Press enter to continue: ' + lineno())
 
         return logical_resource_ids
 

@@ -82,7 +82,7 @@ class TestEbsVolume(unittest.TestCase):
       expected_result = pretty(expected_result)
 
       template_name = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+'/terraform_validator/test_templates/tf/ec2_volume/no_tags.tf'
-      debug = False
+      debug = True
 
       config_dict = {}
       config_dict['template_file'] = template_name
@@ -144,7 +144,7 @@ class TestEbsVolume(unittest.TestCase):
 
 
       template_name = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+'/terraform_validator/test_templates/tf/ec2_volume/has_required_tags.tf'
-      debug = False
+      debug = True
 
       config_dict = {}
       config_dict['template_file'] = template_name

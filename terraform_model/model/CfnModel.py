@@ -193,7 +193,6 @@ class CfnModel:
 
         if self.debug:
             print('trying to find: '+str(resource_type)+lineno())
-            input('enter'+lineno())
 
         resources = []
 
@@ -229,6 +228,7 @@ class CfnModel:
                 print("\n\n########################################")
                 print('### found '+str(len(resources))+' '+str(resource_type)+' resources'+lineno())
                 print("########################################\n\n")
+
 
         return resources
 

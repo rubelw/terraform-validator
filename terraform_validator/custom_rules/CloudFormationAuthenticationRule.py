@@ -83,8 +83,6 @@ class CloudFormationAuthenticationRule(BaseRule):
                         if self.potentially_sensitive_credentials(self.cfn_model.raw_model['Resources'][resource][resource_name]['metadata']['AWS::CloudFormation::Authentication']):
                             logical_resource_ids.append(str(resource))
 
-        if self.debug:
-            input('Press enter to continue: ' + lineno())
 
         return logical_resource_ids
 

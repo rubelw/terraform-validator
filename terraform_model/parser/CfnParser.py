@@ -147,13 +147,11 @@ class CfnParser:
             print("\n##################################################")
             print('properties wired into model element objects'+lineno())
             print("##################################################\n")
-            input('press enter to continue '+lineno())
 
         if self.debug:
             print("\n##################################################")
             print('Transforming hash into parameters'+lineno())
             print("##################################################\n")
-            input('press enter to continue '+lineno())
 
         # Transform cloudformation parameters into parameters object
         cfn_model = self.transform_hash_into_parameters(cloudformation_yml,cfn_model)
@@ -270,9 +268,8 @@ class CfnParser:
         for r in cfn_model.resources:
 
             if cfn_model.resources[r].resource_type not in resource_map:
-                #print('fix cfnparser model map: '+lineno())
-                #sys.exit(1)
-                return cfn_model
+                print('fix cfnparser model map: '+str(cfn_model.resources[r].resource_type)+lineno())
+                continue
 
             if self.debug:
                 print("\n\n#######################################")
@@ -405,7 +402,6 @@ class CfnParser:
             print('cfn model resources:' +str(cfn_model.resources)+lineno())
             print('cfn model raw_model:'+str(cfn_model.raw_model)+lineno())
 
-            input('check model - press enter to continue: '+lineno())
 
         return cfn_model
 
@@ -472,7 +468,6 @@ class CfnParser:
 
                 if self.debug:
                     print('cfn model parameters:'+str(cfn_model.parameters)+lineno())
-                    input('wiring variable: '+str(variable)+lineno())
 
         if 'data' in cfn_hash and cfn_hash['data']:
 
@@ -770,6 +765,8 @@ class CfnParser:
                 print('resource type: '+str(resource_object.resource_type))
             if hasattr(resource_object, 'policy_document'):
                 print('policy document: '+str(resource_object.policy_document))
+            if hasattr(resource_object, 'policy'):
+                print('policy document: '+str(resource_object.policy))
             print(vars(resource_object))
             print("##################################################\n")
 
@@ -879,36 +876,74 @@ class CfnParser:
         module_name = 'AWS'
 
         if type_name == 'aws_iam_policy_attachment':
-            short_name == 'IAMManagedPolicy'
-        if type_name == 'aws_sqs_queue_policy':
-            short_name == 'SQSQueuePolicy'
-        if type_name == 'aws_s3_bucket_policy':
-            short_name == 'S3BucketPolicy'
-        if type_name == 'aws_iam_group':
-            short_name == 'IAMGroup'
-        if type_name == 'egress':
-            short_name == 'EC2SecurityGroupEgress'
-        if type_name == 'ingress':
-            short_name == 'EC2SecurityGroupIngress'
-        if type_name == 'aws_network_interface':
-            short_name == 'EC2NetworkInterface'
-        if type_name == 'aws_iam_user':
+            short_name = 'IAMManagedPolicy'
+
+            if self.debug:
+                print('short_name: '+str(short_name)+lineno())
+        elif type_name == 'aws_sqs_queue_policy':
+            short_name = 'SQSQueuePolicy'
+            if self.debug:
+                print('short_name: '+str(short_name)+lineno())
+        elif type_name == 'aws_s3_bucket_policy':
+            short_name = 'S3BucketPolicy'
+            if self.debug:
+                print('short_name: '+str(short_name)+lineno())
+        elif type_name == 'aws_iam_group':
+            short_name = 'IAMGroup'
+            if self.debug:
+                print('short_name: '+str(short_name)+lineno())
+        elif type_name == 'egress':
+            short_name = 'EC2SecurityGroupEgress'
+            if self.debug:
+                print('short_name: '+str(short_name)+lineno())
+        elif type_name == 'ingress':
+            short_name = 'EC2SecurityGroupIngress'
+            if self.debug:
+                print('short_name: '+str(short_name)+lineno())
+        elif type_name == 'aws_network_interface':
+            short_name = 'EC2NetworkInterface'
+            if self.debug:
+                print('short_name: '+str(short_name)+lineno())
+        elif type_name == 'aws_iam_user':
             short_name = 'IAMUser'
-        if type_name == 'aws_iam_policy':
+            if self.debug:
+                print('short_name: '+str(short_name)+lineno())
+        elif type_name == 'aws_iam_policy':
             short_name = 'IAMPolicy'
-        if type_name == 'aws_instance':
+            if self.debug:
+                print('short_name: '+str(short_name)+lineno())
+        elif type_name == 'aws_instance':
             short_name ='EC2Instance'
-        if type_name == 'aws_elb':
+            if self.debug:
+                print('short_name: '+str(short_name)+lineno())
+        elif type_name == 'aws_elb':
             short_name = 'ElasticLoadBalancingLoadBalancer'
-        if type_name == 'aws_security_group':
+            if self.debug:
+                print('short_name: '+str(short_name)+lineno())
+        elif type_name == 'aws_security_group':
             short_name = 'EC2SecurityGroup'
-        if type_name == 'aws_iam_role':
+            if self.debug:
+                print('short_name: '+str(short_name)+lineno())
+        elif type_name == 'aws_iam_role':
             short_name = 'IAMRole'
-        if type_name == 'aws_security_group_rule':
+            if self.debug:
+                print('short_name: '+str(short_name)+lineno())
+        elif type_name == 'aws_security_group_rule':
             if type == 'x':
                 short_name = 'EC2SecurityGroupEgress'
+                if self.debug:
+                    print('short_name: '+str(short_name)+lineno())
             else:
                 short_name = 'EC2SecurityGroupIngress'
+                if self.debug:
+                    print('short_name: '+str(short_name)+lineno())
+        else:
+            if self.debug:
+                print('Could not find model'+lineno())
+
+            short_name = 'CfnModel'
+
+
 
         #module_names = type_name.split('::')
         if module_name == 'Custom':
@@ -924,7 +959,10 @@ class CfnParser:
         elif module_name == 'AWS':
 
             if self.debug:
+                print("\n########################################")
                 print('module is AWS: '+lineno())
+                print('short name: '+str(short_name)+lineno())
+                print("##########################################\n")
 
 
             if str(type_name) in models2:

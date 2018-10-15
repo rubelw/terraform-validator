@@ -76,7 +76,7 @@ class TestRdsInstance(unittest.TestCase):
       expected_result = pretty(expected_result)
 
       template_name = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+'/terraform_validator/test_templates/tf/rds_instance/rds_instance_publicly_accessible.tf'
-      debug = False
+      debug = True
 
       config_dict = {}
       config_dict['template_file'] = template_name
@@ -155,7 +155,7 @@ class TestRdsInstance(unittest.TestCase):
       expected_result = pretty(expected_result)
 
       template_name = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+'/terraform_validator/test_templates/tf/rds_instance/rds_instance_no_echo_with_default_password.tf'
-      debug = False
+      debug = True
 
       config_dict = {}
       config_dict['template_file'] = template_name
@@ -246,7 +246,7 @@ class TestRdsInstance(unittest.TestCase):
       expected_result = pretty(expected_result)
 
       template_name = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+'/terraform_validator/test_templates/tf/rds_instance/rds_instances_with_public_credentials.tf'
-      debug = False
+      debug = True
 
       config_dict = {}
       config_dict['template_file'] = template_name

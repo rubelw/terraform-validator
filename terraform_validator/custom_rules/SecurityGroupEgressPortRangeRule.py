@@ -114,7 +114,6 @@ class SecurityGroupEgressPortRangeRule(BaseRule):
                     if str(groups.cfn_model['Properties']['ToPort']) != str(groups.cfn_model['Properties']['FromPort']):
                         violating_egresses.append(str(groups.logical_resource_id))
 
-    if self.debug:
-      input('Press enter to continue: '+lineno())
+
 
     return violating_egresses

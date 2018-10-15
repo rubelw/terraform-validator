@@ -6,7 +6,7 @@ provider "aws" {
 }
 
 
-resource "aws_sqs_queue" "q" {
+resource "aws_sqs_queue" "queue1" {
   name = "examplequeue"
 }
 
@@ -21,16 +21,12 @@ resource "aws_sqs_queue_policy" "test" {
     {
       "Sid": "First",
       "Effect": "Allow",
-      "Principal": "*",
+      "NotPrincipal": {"AWS":"arn:aws:iam::111111111111:user/will.rubel"},
       "Action": "sqs:SendMessage",
-      "Resource": "${aws_sqs_queue.q.arn}",
-      "Condition": {
-        "ArnEquals": {
-          "aws:SourceArn": "${aws_sqs_queue.q.arn}"
-        }
-      }
+      "Resource": "*"
     }
   ]
 }
 POLICY
 }
+

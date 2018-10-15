@@ -74,7 +74,5 @@ class ElasticLoadBalancerAccessLoggingRule(BaseRule):
             if self.debug:
                 print('no violating_elbs'+lineno())
 
-        if self.debug:
-            input('Press enter to continue: ' + lineno())
 
         return violating_elbs

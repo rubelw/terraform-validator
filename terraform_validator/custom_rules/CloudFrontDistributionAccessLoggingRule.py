@@ -80,7 +80,5 @@ class CloudFrontDistributionAccessLoggingRule(BaseRule):
             if self.debug:
                 print('no violating_distributions'+lineno())
 
-        if self.debug:
-            input('Press enter to continue: ' + lineno())
 
         return violating_distributions

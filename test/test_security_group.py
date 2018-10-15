@@ -237,7 +237,7 @@ class TestSecurityGroup(unittest.TestCase):
 
         template_name = os.path.dirname(os.path.dirname(os.path.realpath(
             __file__))) + '/terraform_validator/test_templates/tf/security_group/single_security_group_empty_ingress.tf'
-        debug = False
+        debug = True
 
         config_dict = {}
         config_dict['template_file'] = template_name
@@ -352,7 +352,7 @@ class TestSecurityGroup(unittest.TestCase):
 
         template_name = os.path.dirname(os.path.dirname(os.path.realpath(
             __file__))) + '/terraform_validator/test_templates/tf/security_group/two_security_group_two_cidr_ingress.tf'
-        debug = False
+        debug = True
 
         config_dict = {}
         config_dict['template_file'] = template_name
@@ -410,7 +410,7 @@ class TestSecurityGroup(unittest.TestCase):
 
         template_name = os.path.dirname(os.path.dirname(
             os.path.realpath(__file__))) + '/terraform_validator/test_templates/tf/security_group/multiple_inline_egress.tf'
-        debug = False
+        debug = True
 
         config_dict = {}
         config_dict['template_file'] = template_name
@@ -491,7 +491,7 @@ class TestSecurityGroup(unittest.TestCase):
 
         template_name = os.path.dirname(os.path.dirname(os.path.realpath(
             __file__))) + '/terraform_validator/test_templates/tf/security_group/non_32_cidr_standalone_ingress.tf'
-        debug = False
+        debug = True
 
         config_dict = {}
         config_dict['template_file'] = template_name
@@ -570,7 +570,7 @@ class TestSecurityGroup(unittest.TestCase):
 
         template_name = os.path.dirname(os.path.dirname(
             os.path.realpath(__file__))) + '/terraform_validator/test_templates/tf/security_group/non_32_cidr.tf'
-        debug = False
+        debug = True
 
         config_dict = {}
         config_dict['template_file'] = template_name
@@ -633,7 +633,7 @@ class TestSecurityGroup(unittest.TestCase):
       expected_result = pretty(expected_result)
 
       template_name = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+'/terraform_validator/test_templates/tf/security_group/multiple_ingress_security_groups.tf'
-      debug = False
+      debug = True
 
       config_dict = {}
       config_dict['template_file'] = template_name

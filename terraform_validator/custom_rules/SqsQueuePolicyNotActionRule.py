@@ -64,8 +64,9 @@ class SqsQueuePolicyNotActionRule(BaseRule):
         for resource in resources:
             if self.debug:
               print('resource: '+str(resource)+lineno())
+              print('vars: '+str(vars(resource)))
 
-            if hasattr(resource, 'policy_document'):
+            if hasattr(resource, 'policy'):
 
               if resource.policy_document:
                 if self.debug:
@@ -80,7 +81,5 @@ class SqsQueuePolicyNotActionRule(BaseRule):
         if self.debug:
           print('no violating_policies' + lineno())
 
-      if self.debug:
-          input('Press enter to continue: ' + lineno())
 
       return violating_policies

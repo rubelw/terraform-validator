@@ -27,6 +27,6 @@ class WithPolicyDocumentParser:
             print('resource: '+str(resource))
             print('vars: '+str(vars(resource)))
         parser = PolicyDocumentParser(debug)
-        resource.policy_document = parser.parse(resource.policyDocument)
+        resource.policy_document = parser.parse(cfn_model, resource.policy)
 
         return resource

@@ -87,7 +87,5 @@ class IamRoleNotResourceOnPermissionsPolicyRule(BaseRule):
     if self.debug:
       print('returning violating_roles to'+lineno())
 
-    if self.debug:
-      input('Press enter to continue: '+lineno())
 
     return violating_roles

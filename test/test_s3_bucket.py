@@ -83,7 +83,7 @@ class TestS3Bucket(unittest.TestCase):
       expected_result = pretty(expected_result)
 
       template_name = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+'/terraform_validator/test_templates/tf/s3_bucket/buckets_with_insecure_acl.tf'
-      debug = False
+      debug = True
 
       config_dict = {}
       config_dict['template_file'] = template_name

@@ -87,7 +87,5 @@ class SecurityGroupIngressPortRangeRule(BaseRule):
         if self.debug:
             print('violations: '+str(list(set(violating_ingresses))))
 
-        if self.debug:
-            input('Press enter to continue: ' + lineno())
 
         return violating_ingresses
