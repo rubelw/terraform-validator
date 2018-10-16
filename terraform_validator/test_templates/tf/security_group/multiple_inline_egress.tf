@@ -44,3 +44,30 @@ resource "aws_security_group" "allow_all" {
     Name = "allow_all"
   }
 }
+
+
+#{
+#  "Resources": {
+#    "sg5": {
+#      "Type" : "AWS::EC2::SecurityGroup",
+#      "Properties" : {
+#        "GroupDescription" : "some_group_desc2",
+#        "SecurityGroupEgress" : [
+#          {
+#            "CidrIp" : "1.1.1.1/32",
+#            "FromPort" : 36,
+#            "ToPort" : 36,
+#            "IpProtocol" : "tcp"
+#          },
+#          {
+#            "CidrIp" : "1.2.3.4/32",
+#            "FromPort" : 45,
+#            "ToPort" : 45,
+#            "IpProtocol" : "tcp"
+#          }
+#        ],
+#        "VpcId" : "vpc-9f8e9dfa"
+#      }
+#    }
+#  }
+#}

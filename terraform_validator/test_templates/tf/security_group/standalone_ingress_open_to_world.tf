@@ -44,3 +44,18 @@ resource "aws_security_group" "allow_all" {
     Name = "allow_all"
   }
 }
+
+#{
+#  "Resources": {
+#    "securityGroupIngress" : {
+#      "Type" : "AWS::EC2::SecurityGroupIngress",
+#      "Properties" : {
+#        "GroupId": "sg-12341234",
+#        "CidrIp" : "0.0.0.0/0",
+#        "FromPort" : 46,
+#        "ToPort" : 46,
+#        "IpProtocol" : "tcp"
+#      }
+#    }
+#  }
+#}

@@ -1,0 +1,3 @@
+[
+  "test/test_sns_policy.py::TestSnsPolicy::test_sns_policy"
+]

@@ -44,3 +44,16 @@ resource "aws_security_group" "allow_all" {
     Name = "allow_all"
   }
 }
+
+
+#{
+#  "Resources": {
+#    "sg": {
+#      "Type" : "AWS::EC2::SecurityGroup",
+#      "Properties" : {
+#        "GroupDescription" : "some_group_desc",
+#        "VpcId" : "vpc-9f8e9dfa"
+#      }
+#    }
+#  }
+#}

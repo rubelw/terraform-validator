@@ -44,3 +44,12 @@ resource "aws_security_group" "allow_all" {
     Name = "allow_all"
   }
 }
+
+
+#{
+#  "Resources": {
+#    "sg": {
+#      "Type" : "AWS::EC2::SecurityGroup"
+#    }
+#  }
+#}

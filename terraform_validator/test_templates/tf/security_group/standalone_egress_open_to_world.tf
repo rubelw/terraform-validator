@@ -44,3 +44,19 @@ resource "aws_security_group" "allow_all" {
     Name = "allow_all"
   }
 }
+
+
+#{
+#  "Resources": {
+#    "securityGroupEgress" : {
+#      "Type" : "AWS::EC2::SecurityGroupEgress",
+#      "Properties" : {
+#        "GroupId": "sg-12341234",
+#        "CidrIp" : "0.0.0.0/0",
+#        "FromPort" : 45,
+#        "ToPort" : 45,
+#        "IpProtocol" : "tcp"
+#      }
+#    }
+#  }
+#}
