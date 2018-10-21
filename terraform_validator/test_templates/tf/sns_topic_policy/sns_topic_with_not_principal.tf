@@ -13,7 +13,7 @@ resource "aws_sns_topic" "MySNSTopic" {
 resource "aws_sns_topic_policy" "default" {
   arn = "${aws_sns_topic.MySNSTopic.arn}"
 
-  policy = "${data.aws_iam_policy_document.sns-topic-policy.json}"
+  policy = "${data.aws_iam_policy_document.mysnspolicyA.json}"
 }
 
 data "aws_iam_policy_document" "mysnspolicyA" {
@@ -26,7 +26,7 @@ data "aws_iam_policy_document" "mysnspolicyA" {
 
     effect = "Allow"
 
-    principals {
+    not_principals {
       type        = "AWS"
       identifiers = ["arn:aws:iam::111111111111:user/will.rubel"]
     }

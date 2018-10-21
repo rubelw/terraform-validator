@@ -42,10 +42,10 @@ resource "aws_sns_topic" "MySNSTopic2" {
   name = "MySNSTopic2"
 }
 
-resource "aws_sns_topic_policy" "default" {
+resource "aws_sns_topic_policy" "default2" {
   arn = "${aws_sns_topic.MySNSTopic2.arn}"
 
-  policy = "${data.aws_iam_policy_document.mysnspolicyA.json}"
+  policy = "${data.aws_iam_policy_document.mysnspolicyB.json}"
 }
 
 

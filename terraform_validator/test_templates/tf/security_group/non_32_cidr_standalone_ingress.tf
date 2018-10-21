@@ -6,43 +6,77 @@ provider "aws" {
 }
 
 
+variable somethingSpecial {
+  type = "string"
+  default = "test"
+}
 
-resource "aws_security_group" "allow_all" {
-  name        = "allow_all"
-  description = "Allow all inbound traffic"
-  vpc_id      = "${aws_vpc.main.id}"
 
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+resource "aws_security_group" "sg" {
+  name        = "sg"
+  description = "sg"
+  vpc_id      = "vpc-9f8e9dfa"
 
   egress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-    cidr_blocks     = ["0.0.0.0/0"]
-    prefix_list_ids = ["pl-12c4e678"]
+    from_port       = 34
+    to_port         = 34
+    protocol        = "tcp"
+    cidr_blocks     = ["10.1.2.3/32"]
   }
 }
-Basic usage with tags:
 
-resource "aws_security_group" "allow_all" {
-  name        = "allow_all"
-  description = "Allow all inbound traffic"
 
-  ingress {
-    from_port   = 0
-    to_port     = 65535
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+resource "aws_security_group_rule" "securityGroupIngress1" {
+  type            = "ingress"
+  from_port       = 36
+  to_port         = 66
+  protocol        = "tcp"
+  cidr_blocks     = ["10.1.2.3/32"]
 
-  tags {
-    Name = "allow_all"
-  }
+  security_group_id = "${aws_security_group.sg.id}"
+}
+
+
+resource "aws_security_group_rule" "securityGroupIngress2" {
+  type            = "ingress"
+  from_port       = 36
+  to_port         = 66
+  protocol        = "tcp"
+  cidr_blocks     = ["10.1.2.3/32",,"3.4.5.6/24"]
+
+  security_group_id = "${aws_security_group.sg.id}"
+}
+
+
+resource "aws_security_group_rule" "securityGroupIngress3" {
+  type            = "ingress"
+  from_port       = 46
+  to_port         = 46
+  protocol        = "tcp"
+  cidr_blocks     = ["10.1.2.3/24"]
+
+  security_group_id = "${aws_security_group.sg.id}"
+}
+
+
+resource "aws_security_group_rule" "securityGroupIngress4" {
+  type            = "ingress"
+  from_port       = 46
+  to_port         = 46
+  protocol        = "tcp"
+  cidr_blocks     = ["${var.somethingSpecial}"]
+
+  security_group_id = "${aws_security_group.sg.id}"
+}
+
+resource "aws_security_group_rule" "securityGroupIngress5" {
+  type            = "ingress"
+  from_port       = 46
+  to_port         = 46
+  protocol        = "tcp"
+  cidr_blocks     = ["10.1.2.3/32", "${var.somethingSpecial}"]
+
+  security_group_id = "${aws_security_group.sg.id}"
 }
 
 

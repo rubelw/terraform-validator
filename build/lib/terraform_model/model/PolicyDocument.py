@@ -37,6 +37,9 @@ class PolicyDocument:
 
         for statement in self.statements:
 
+            if self.debug:
+                print('statement: '+str(statement)+lineno())
+
             if len(statement.wildcard_resources())>0 and str(statement.effect) == 'Allow':
                 return True
 
@@ -106,7 +109,7 @@ class PolicyDocument:
 
         for statement in self.statements:
             if self.debug or debug:
-                print('statment: '+str(statement)+lineno())
+                print('statement: '+str(statement)+lineno())
                 print('vars: '+str(vars(statement)))
                 print('wildcard_principal:'+str(statement.wildcard_principal())+lineno())
 
@@ -205,10 +208,3 @@ class PolicyDocument:
             print('to_s'+lineno())
         # FIXME
         sys.exit(1)
-        #<< END
-
-        #{
-        #    version =  # {@version}
-        #statements =
-        # {@statements}
-        #}

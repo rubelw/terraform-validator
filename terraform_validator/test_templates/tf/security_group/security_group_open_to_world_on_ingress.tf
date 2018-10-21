@@ -7,43 +7,38 @@ provider "aws" {
 
 
 
-resource "aws_security_group" "allow_all" {
-  name        = "allow_all"
-  description = "Allow all inbound traffic"
-  vpc_id      = "${aws_vpc.main.id}"
+resource "aws_security_group" "sgOpenIngress" {
+  name        = "sgOpenIngress"
+  description = "sgOpenIngress"
+  vpc_id      = "vpc-9f8e9dfa"
 
   ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-    cidr_blocks     = ["0.0.0.0/0"]
-    prefix_list_ids = ["pl-12c4e678"]
-  }
-}
-Basic usage with tags:
-
-resource "aws_security_group" "allow_all" {
-  name        = "allow_all"
-  description = "Allow all inbound traffic"
-
-  ingress {
-    from_port   = 0
-    to_port     = 65535
+    from_port   = 34
+    to_port     = 34
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
-  tags {
-    Name = "allow_all"
-  }
 }
+
+
+resource "aws_security_group" "sgOpenIngress2" {
+  name        = "sgOpenIngress2"
+  description = "sgOpenIngress2"
+  vpc_id      = "vpc-9f8e9dfa"
+
+}
+
+
+resource "aws_security_group_rule" "securityGroupIngress" {
+  type            = "ingress"
+  from_port       = 46
+  to_port         = 46
+  protocol        = "tcp"
+  cidr_blocks     = ["0.0.0.0/0"]
+
+  security_group_id = "${aws_security_group.sgOpenIngress2.id}"
+}
+
 
 
 #{

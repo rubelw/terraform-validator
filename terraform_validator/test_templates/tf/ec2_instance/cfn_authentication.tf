@@ -58,3 +58,35 @@ resource "aws_network_interface" "test" {
     device_index = 1
   }
 }
+
+#{
+#  "Parameters": {
+#    "subnetId": {
+#      "Type": "String",
+#      "Default": "subnet-4fd01116"
+#    }
+#  },
+
+#  "Resources": {
+#    "EC2I4LBA1": {
+#      "Type": "AWS::EC2::Instance",
+#      "Properties": {
+#        "ImageId": "ami-6df1e514",
+#        "InstanceType": "t2.micro",
+#        "SubnetId": {
+#          "Ref": "subnetId"
+#        }
+#      },
+#      "Metadata": {
+#        "AWS::CloudFormation::Authentication": {
+#          "testBasic" : {
+#            "type" : "basic",
+#            "username" : "biff",
+#            "password" : "badpassword",
+#            "uris" : [ "http://www.example.com/test" ]
+#          }
+#        }
+#      }
+#    }
+#  }
+#}

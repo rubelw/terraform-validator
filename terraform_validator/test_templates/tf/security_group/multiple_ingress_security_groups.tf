@@ -5,44 +5,53 @@ provider "aws" {
   region     = "us-east-1"
 }
 
+variable "jumpCIDR" {
+  type = "string"
+  default = "0.0.0.0/16"
 
+}
 
-resource "aws_security_group" "allow_all" {
-  name        = "allow_all"
-  description = "Allow all inbound traffic"
+variable "otherCIDR" {
+  type = "string"
+  default = "0.0.0.0/16"
+
+}
+
+resource "aws_security_group" "emrSecurityGroup" {
+  name        = "emrSecurityGroup"
+  description = "emrSecurityGroup"
   vpc_id      = "${aws_vpc.main.id}"
 
   ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["${var.jumpCIDR}"]
+  }
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["${var.otherCIDR}"]
   }
 
   egress {
-    from_port       = 0
-    to_port         = 0
+    from_port       = -1
+    to_port         = -1
     protocol        = "-1"
     cidr_blocks     = ["0.0.0.0/0"]
-    prefix_list_ids = ["pl-12c4e678"]
   }
 }
-Basic usage with tags:
 
-resource "aws_security_group" "allow_all" {
-  name        = "allow_all"
-  description = "Allow all inbound traffic"
 
-  ingress {
-    from_port   = 0
-    to_port     = 65535
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags {
-    Name = "allow_all"
-  }
+resource "aws_security_group_rule" "emrSecurityGroupIngress" {
+  type            = "ingress"
+  from_port       = -1
+  to_port         = -1
+  protocol        = "-1"
+  cidr_blocks     = ["1.2.3.5/32"]
+  source_security_group_id = "${aws_security_group.emrSecurityGroup.id}"
+  security_group_id = "${aws_security_group.emrSecurityGroup.id}"
 }
 
 

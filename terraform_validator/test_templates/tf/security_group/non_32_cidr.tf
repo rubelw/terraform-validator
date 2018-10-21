@@ -7,46 +7,106 @@ provider "aws" {
 
 
 
-resource "aws_security_group" "allow_all" {
-  name        = "allow_all"
-  description = "Allow all inbound traffic"
-  vpc_id      = "${aws_vpc.main.id}"
+variable somethingSpecial {
+  type = "string"
+  default = "test"
+}
+
+
+resource "aws_security_group" "sg" {
+  name        = "sg"
+  description = "sg"
+  vpc_id      = "vpc-9f8e9dfa"
 
   ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 34
+    to_port     =34
+    protocol    = "tcp"
+    cidr_blocks = ["10.1.2.0/24"]
   }
 
   egress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-    cidr_blocks     = ["0.0.0.0/0"]
-    prefix_list_ids = ["pl-12c4e678"]
+    from_port       = 34
+    to_port         = 34
+    protocol        = "tcp"
+    cidr_blocks     = ["10.1.2.3/32"]
   }
 }
-Basic usage with tags:
 
-resource "aws_security_group" "allow_all" {
-  name        = "allow_all"
-  description = "Allow all inbound traffic"
+resource "aws_security_group" "sg2" {
+  name        = "sg"
+  description = "sg"
+  vpc_id      = "vpc-9f8e9dfa"
 
   ingress {
-    from_port   = 0
-    to_port     = 65535
+    from_port   = 36
+    to_port     =36
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["10.2.0.0/16"]
   }
 
-  tags {
-    Name = "allow_all"
+  ingress {
+    from_port   = 46
+    to_port     =46
+    protocol    = "tcp"
+    cidr_blocks = ["1.2.3.4/32"]
+  }
+  ingress {
+    from_port   = 33
+    to_port     =33
+    protocol    = "tcp"
+    cidr_blocks = ["${var.somethingSpecial}"]
+  }
+  egress {
+    from_port       = 34
+    to_port         = 34
+    protocol        = "tcp"
+    cidr_blocks     = ["10.1.2.3/32"]
   }
 }
 
 
 
+resource "aws_security_group" "sg3" {
+  name        = "sg"
+  description = "sg"
+  vpc_id      = "vpc-9f8e9dfa"
+
+  ingress {
+    from_port   = 33
+    to_port     =33
+    protocol    = "tcp"
+    cidr_blocks = ["${var.somethingSpecial}"]
+  }
+
+  egress {
+    from_port       = 34
+    to_port         = 34
+    protocol        = "tcp"
+    cidr_blocks     = ["10.1.2.3/32"]
+  }
+}
+
+
+resource "aws_security_group" "sg4" {
+  name        = "sg"
+  description = "sg"
+  vpc_id      = "vpc-9f8e9dfa"
+
+  ingress {
+    from_port   = 33
+    to_port     =33
+    protocol    = "tcp"
+    cidr_blocks = ["${var.somethingSpecial}","1.2.3.4/32"]
+  }
+
+  egress {
+    from_port       = 34
+    to_port         = 34
+    protocol        = "tcp"
+    cidr_blocks     = ["10.1.2.3/32"]
+  }
+}
 #{
 #  "Parameters": {
 #    "somethingSpecial": {

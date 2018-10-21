@@ -15,3 +15,24 @@ resource "aws_s3_bucket" "b" {
     Environment = "Dev"
   }
 }
+
+
+#{
+#  "Resources": {
+#    "S3BucketRead" : {
+#      "Type" : "AWS::S3::Bucket",
+#      "Properties" : {
+#        "BucketName" : "fakebucketfakebucket",
+#        "AccessControl": "PublicRead"
+#      }
+#    },
+#
+#    "S3BucketReadWrite" : {
+#      "Type" : "AWS::S3::Bucket",
+#      "Properties" : {
+#        "BucketName" : "fakebucketfakebucket2",
+#        "AccessControl": "PublicReadWrite"
+#      }
+#    }
+#  }
+#}

@@ -23,9 +23,12 @@ class WithPolicyDocumentParser:
         :return:
         """
         if debug:
+            print("\n######################################")
             print('parse'+lineno())
-            print('resource: '+str(resource)+line)
+            print('resource: '+str(resource)+lineno())
             print('vars: '+str(vars(resource))+lineno())
+            print("######################################\n")
+
 
         parser = PolicyDocumentParser(debug)
         resource.policy_document = parser.parse(cfn_model, resource.policy)

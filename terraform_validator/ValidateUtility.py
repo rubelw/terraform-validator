@@ -135,6 +135,7 @@ class ValidateUtility:
         if self.debug:
             print('ValidateUtility - validate'+lineno())
 
+
         input_path = self.input_path
         if self.debug:
             print('input_path: '+str(input_path)+lineno())
@@ -148,7 +149,10 @@ class ValidateUtility:
         aggregate_results = self.audit_aggregate_across_files_and_render_results(input_path=input_path)
 
         if self.debug:
+            print("\n###################################################")
             print('aggregate_results '+str(aggregate_results)+lineno())
+            input('Press Enter to continue: '+lineno())
+            print("######################################################\n")
 
         rendered_results =  self.render_results(aggregate_results=aggregate_results, output_format='json')
 
@@ -177,7 +181,10 @@ class ValidateUtility:
         aggregate_results = self.audit_aggregate_across_files(input_path=input_path)
 
         if self.debug:
-            print('results: '+str(aggregate_results)+lineno())
+            print("\n###########################################")
+            print('aggregated results: '+str(aggregate_results)+lineno())
+            input('Press Enter to continue: '+lineno())
+            print("##############################################\n")
 
         return aggregate_results
 
@@ -233,7 +240,11 @@ class ValidateUtility:
             templates=[self.template_file]
 
         if self.debug:
+            print("\n######################################")
+            print('Template:'+lineno())
             print(templates)
+            input('Press Enter to continue: '+lineno())
+            print("#######################################\n")
 
         aggregate_results = []
 
@@ -249,12 +260,19 @@ class ValidateUtility:
 
         }
 
+        if self.debug:
+            print("\n#########################################")
+            print("Beginning to iterate through templates")
+            input("Press Enter to continue "+lineno())
+            print("############################################\n")
 
         for template in templates:
 
             if self.debug:
+                print("\n######################################")
                 print('template: '+str(template)+lineno())
                 print('type: '+str(type(template))+lineno())
+                print("########################################\n")
 
 
             if not self.suppress_errors:
@@ -398,7 +416,10 @@ class ValidateUtility:
         #file_data = file_data + '}'
 
         if self.debug:
+            print("\n###############################################")
             print('file data is now: ' + str(file_data) + lineno())
+            input("Press Enter to continue: "+lineno())
+            print("###################################################\n")
 
         #if type(file_data) == type(str()):
         #    json_acceptable_string = file_data.replace("'", "\"")
@@ -412,14 +433,16 @@ class ValidateUtility:
         #    print("#############################\n")
 
         if self.debug:
-            print('made it'+lineno())
             print('parameter values: '+str(parameter_values_string)+lineno())
 
         file_results = self.audit(cloudformation_string=file_data, parameter_values_string= parameter_values_string)
 
 
         if self.debug:
+            print("\n#############################################")
             print('file results: '+str(file_results)+lineno())
+            print('Press Enter to continue: '+lineno())
+            print("#################################################\n")
 
         results = {}
 
@@ -453,7 +476,10 @@ class ValidateUtility:
         schema_validation_errors = None
 
         if self.debug:
+            print("\n#################################")
             print('schema validated: '+lineno())
+            input('Press Enter to continue: '+lineno())
+            print("###################################\n")
 
         try:
 
@@ -488,12 +514,15 @@ class ValidateUtility:
                 schema_validation_errors=e.to_hash()
             else:
                 schema_validation_errors=e
+
         if self.debug:
             if cfn_model:
+                print("\n############################################")
                 print('cfn_model: '+str(dir(cfn_model))+lineno())
                 print('cfn_model: '+str(vars(cfn_model))+lineno())
                 print(dir(cfn_model))
-
+                print("#############################################\n")
+                print('Parameters are:'+lineno())
                 for parameters in cfn_model.parameters:
                     print('parameter: '+str(parameters))
                     print(cfn_model.parameters[parameters])
@@ -502,13 +531,35 @@ class ValidateUtility:
                 print('Done parsing parameters'+lineno())
                 print("###############################\n\n")
 
+
+                print('Outputs are:'+lineno())
+                for outputs in cfn_model.outputs:
+                    print('output: '+str(outputs))
+                    print(cfn_model.outputs[outputs])
+
+
+                print('Locals are:'+lineno())
+                for locals in cfn_model.locals:
+                    print('local: '+str(locals))
+                    print(cfn_model.locals[locals])
+
+
+                print('Data is:'+lineno())
+                for dta in cfn_model.data:
+                    print('data: '+str(dta))
+                    print(cfn_model.data[dta])
+
+
+
                 for resource in cfn_model.resources:
+                    print("\n################################################")
                     print('resource: '+str(resource))
                     print(cfn_model.resources[resource])
                     print('vars: '+str(vars(cfn_model.resources[resource])))
                     print('dir: '+str(dir(cfn_model.resources[resource])))
                     for attr in dir(cfn_model.resources[resource]):
                         print("obj.%s = %r" % (attr, getattr(cfn_model.resources[resource], attr)))
+                    print("###################################################\n")
 
                 print("\n\n###############################")
                 print('Done parsing resources'+lineno())
@@ -517,6 +568,7 @@ class ValidateUtility:
 
                 print('vars: '+str(vars(cfn_model))+lineno())
                 print('parameters: '+str(cfn_model.parameters))
+                input('Press Enter to continue: '+lineno())
 
         if not schema_validation_errors:
             if cfn_model:

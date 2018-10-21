@@ -5,46 +5,109 @@ provider "aws" {
   region     = "us-east-1"
 }
 
+resource "aws_vpc" "main" {
+  cidr_block = "10.0.0.0/16"
+}
 
+resource "aws_subnet" "main" {
+  vpc_id     = "${aws_vpc.main.id}"
+  cidr_block = "10.0.1.0/24"
+  map_public_ip_on_launch = false
+  tags {
+    Name = "Main"
+  }
+}
 
-resource "aws_security_group" "allow_all" {
-  name        = "allow_all"
-  description = "Allow all inbound traffic"
+resource "aws_internet_gateway" "gw" {
+  vpc_id = "${aws_vpc.main.id}"
+
+  tags {
+    Name = "main"
+  }
+}
+
+resource "aws_route_table" "r" {
+  vpc_id = "${aws_vpc.main.id}"
+
+  route {
+    cidr_block = "10.0.1.0/24"
+    gateway_id = "${aws_internet_gateway.gw.id}"
+  }
+  tags {
+    Name = "main"
+  }
+}
+
+resource "aws_route_table_association" "a" {
+  subnet_id      = "${aws_subnet.main.id}"
+  route_table_id = "${aws_route_table.r.id}"
+}
+
+resource "aws_vpc_ipv4_cidr_block_association" "secondary_cidr" {
+  vpc_id = "${aws_vpc.main.id}"
+  cidr_block = "172.2.0.0/16"
+}
+
+resource "aws_security_group" "InstanceSecurityGroup4" {
+  name        = "InstanceSecurityGroup4"
+  description = "InstanceSecurityGroup4"
   vpc_id      = "${aws_vpc.main.id}"
 
   ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-    cidr_blocks     = ["0.0.0.0/0"]
-    prefix_list_ids = ["pl-12c4e678"]
-  }
-}
-Basic usage with tags:
-
-resource "aws_security_group" "allow_all" {
-  name        = "allow_all"
-  description = "Allow all inbound traffic"
-
-  ingress {
-    from_port   = 0
-    to_port     = 65535
+    from_port   = 22
+    to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags {
-    Name = "allow_all"
-  }
+
 }
 
+
+resource "aws_security_group" "InstanceSecurityGroup3" {
+  name        = "InstanceSecurityGroup3"
+  description = "InstanceSecurityGroup3"
+  vpc_id      = "${aws_vpc.main.id}"
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+
+}
+
+resource "aws_security_group" "InstanceSecurityGroup2" {
+  name        = "InstanceSecurityGroup2"
+  description = "InstanceSecurityGroup2"
+  vpc_id      = "${aws_vpc.main.id}"
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+
+}
+
+resource "aws_security_group" "InstanceSecurityGroup" {
+  name        = "InstanceSecurityGroup"
+  description = "InstanceSecurityGroup"
+  vpc_id      = "${aws_vpc.main.id}"
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+
+}
 
 
 #{

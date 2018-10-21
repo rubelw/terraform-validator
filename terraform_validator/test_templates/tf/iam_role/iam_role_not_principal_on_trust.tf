@@ -25,3 +25,45 @@ resource "aws_iam_role" "test_role" {
 }
 EOF
 }
+
+
+#{
+#  "AWSTemplateFormatVersion": "2010-09-09",
+#  "Resources": {
+#    "NotPrincipalTrustRole": {
+#      "Type": "AWS::IAM::Role",
+#      "Properties": {
+#        "AssumeRolePolicyDocument": {
+#          "Version": "2012-10-17",
+#          "Statement": [
+#            {
+#              "Effect": "Allow",
+#              "NotPrincipal": {
+#                "Service": [
+#                  "ec2.amazonaws.com"
+#                ]
+#              },
+#              "dAction": "sts:AssumeRole"
+#            }
+#          ]
+#        },
+#        "Path": "/",
+#        "Policies": [
+#          {
+#            "PolicyName": "root",
+#            "PolicyDocument": {
+#              "Version": "2012-10-17",
+#              "Statement": [
+#                {
+#                  "Effect": "Allow",
+#                  "Action": "s3:*",
+#                  "Resource": "*"
+#                }
+#              ]
+#            }
+#          }
+#        ]
+#      }
+#    }
+#  }
+#}

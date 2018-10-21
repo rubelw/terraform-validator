@@ -15,3 +15,28 @@ resource "aws_s3_bucket" "b" {
     Environment = "Dev"
   }
 }
+
+#{
+#  "Resources": {
+#    "S3Bucket" : {
+#      "Type" : "AWS::S3::Bucket",
+#      "Properties" : {
+#        "BucketName" : "fakebucketfakebucket2",
+#        "Tags" : [
+#          {
+#            "Key" : "ResourceOwner",
+#            "Value" : "resourceowner"
+#          },
+#          {
+#            "Key" : "DeployedBy",
+#            "Value" : "deployedby"
+#          },
+#          {
+#            "Key" : "Name",
+#            "Value" : "name"
+#          }
+#        ]
+#      }
+#    }
+#  }
+#}

@@ -34,3 +34,28 @@ resource "aws_iam_user_policy" "lb_ro" {
 }
 EOF
 }
+
+
+#{
+#  "Resources": {
+#    "myuser2": {
+#      "Type": "AWS::IAM::User"
+#    },
+
+#    "addUserToGroup" : {
+#      "Type" : "AWS::IAM::UserToGroupAddition",
+#      "Properties" : {
+#        "GroupName" : "group1",
+#        "Users" : [ { "Ref" : "myuser2" } ]
+#      }
+#    },
+
+#    "addUserToGroup1" : {
+#      "Type" : "AWS::IAM::UserToGroupAddition",
+#      "Properties" : {
+#        "GroupName" : "group2",
+#        "Users" : [ { "Ref" : "myuser2" } ]
+#      }
+#    }
+#  }
+#}

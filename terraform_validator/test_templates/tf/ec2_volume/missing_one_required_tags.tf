@@ -6,10 +6,19 @@ provider "aws" {
 }
 
 
-resource "aws_ebs_volume" "example" {
-    availability_zone = "us-west-2a"
-    size = 40
+
+resource "aws_ebs_volume" "NewVolume" {
+    availability_zone = "us-east-1c"
+    size = 100
+    type = "io1"
+    iops = 100
+    encrypted = true
     tags {
-        Name = "HelloWorld"
+        ResourceOwner = "resourceowner"
+        DeployedBy = "deployedby"
+        Name = "name"
+
+
     }
 }
+

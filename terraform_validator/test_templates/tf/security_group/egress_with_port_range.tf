@@ -6,6 +6,16 @@ provider "aws" {
 }
 
 
+variable "aws_access_key" {
+  type = "string"
+  default = "xx"
+
+}
+
+variable "aws_secret_key" {
+  type = "string"
+  default = "xx"
+}
 
 resource "aws_security_group" "some_group_desc" {
   name        = "some_group_desc"

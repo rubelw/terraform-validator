@@ -70,6 +70,12 @@ class SnsTopicPolicyNotPrincipalRule(BaseRule):
 
                         if resource.policy_document.allows_not_principal():
                             violating_policies.append(str(resource.logical_resource_id))
+                elif hasattr(resource, 'policy'):
+
+                    if resource.policy_document:
+
+                        if resource.policy.allows_not_principal():
+                            violating_policies.append(str(resource.logical_resource_id))
 
         else:
             if self.debug:

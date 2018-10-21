@@ -2,3 +2,5 @@
 Sphinx
 sphinxcontrib-issuetracker
 mock
+pykwalify
+schema

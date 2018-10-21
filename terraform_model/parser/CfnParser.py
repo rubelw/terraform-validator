@@ -2,6 +2,7 @@ from __future__ import absolute_import, division, print_function
 import sys
 import inspect
 import json
+import re
 import traceback
 from dill.source import getname
 from terraform_model.validator import CloudformationValidator
@@ -73,6 +74,7 @@ class CfnParser:
             print('CfnParser - parse'+lineno())
             print('Beginning to parse cloudformation template')
             print('cloudformation type: '+str(type(cloudformation_yml)))
+            input('Press Enter to continue: '+lineno())
             print("##########################################################\n\n")
         try:
             self.pre_validate_model(cloudformation_yml)
@@ -96,6 +98,7 @@ class CfnParser:
             print("\n\n#########################################")
             print('cloudformation template pre_validated'+lineno())
             print('Prevalidating cloudformation template')
+            input('Press Enter to Continue: '+lineno())
             print("#############################################\n\n")
 
 
@@ -153,6 +156,13 @@ class CfnParser:
             print('Transforming hash into parameters'+lineno())
             print("##################################################\n")
 
+        if self.debug:
+            print("\n#########################################################")
+            print('Cloudformation properties now wired into ModelElement objects'+lineno())
+            print("#########################################################\n")
+
+
+
         # Transform cloudformation parameters into parameters object
         cfn_model = self.transform_hash_into_parameters(cloudformation_yml,cfn_model)
 
@@ -189,7 +199,10 @@ class CfnParser:
                 print('id: '+str(cfn_model.outputs[output].id)+lineno())
                 print('type: '+str(cfn_model.outputs[output].type)+lineno())
 
-
+        if self.debug:
+            print("\n#########################################################")
+            print('Cloudformation parameters now transformed into objects'+lineno())
+            print("#########################################################\n")
 
 
         # pass 2: tie together separate resources only where necessary to make life easier for rule logic
@@ -242,6 +255,7 @@ class CfnParser:
             print('raw model: '+str(cfn_model.raw_model)+lineno())
             print("##########################################################\n\n")
 
+        # Get a list of all the parsers
         resource_parser_class = ParserRegistry(debug=self.debug)
 
         resource_map = {
@@ -256,20 +270,25 @@ class CfnParser:
             'aws_network_interface': 'AWS::EC2::NetworkInterface',
             'aws_s3_bucket_policy': 'AWS::S3::BucketPolicy',
             'aws_sqs_queue_policy': 'AWS::SQS::QueuePolicy',
-            'aws_iam_policy_attachment': 'AWS::IAM::ManagedPolicy'
+            'aws_iam_policy_attachment': 'AWS::IAM::ManagedPolicy',
+            'aws_sns_topic_policy': 'AWS::SNS::TopicPolicy'
         }
 
 
         if self.debug:
             print("\n##############################")
-            print("Iterating through each of the resources in the cfn model")
+            print("Iterating through each of the resources in the cfn model"+lineno())
             print("################################\n")
 
         for r in cfn_model.resources:
 
             if cfn_model.resources[r].resource_type not in resource_map:
-                print('fix cfnparser model map: '+str(cfn_model.resources[r].resource_type)+lineno())
+                print('fix cfnparser model map: ' + str(cfn_model.resources[r].resource_type) + lineno())
+                if self.debug:
+                    input('Press Enter to continue' + lineno())
+
                 continue
+
 
             if self.debug:
                 print("\n\n#######################################")
@@ -278,7 +297,7 @@ class CfnParser:
 
                 print('resource type: '+str(type(cfn_model.resources[r].resource_type))+lineno())
                 print('cfn_model type: '+str(cfn_model.resources[r].resource_type)+lineno())
-
+                input('Press enter to continue: '+lineno())
                 #print('parser registry:'+str(resource_parser_class.registry)+lineno())
 
 
@@ -286,7 +305,8 @@ class CfnParser:
             if resource_map[cfn_model.resources[r].resource_type] in resource_parser_class.registry:
 
                 if self.debug:
-                    print('found it the resource parser we were looking for '+lineno())
+                    print("\n#####################################################")
+                    print('found the resource parser we were looking for '+lineno())
                     print('type: '+str(cfn_model.resources[r].resource_type)+lineno())
                     #print('class: '+str(resource_parser_class.registry[cfn_model.resources[r].resource_type])+lineno())
 
@@ -299,13 +319,12 @@ class CfnParser:
 
                 if self.debug:
                     print('sending resource to parser: '+str(cfn_model.resources[r])+lineno())
-
-
-                resource_parser.parse(cfn_model, cfn_model.resources[r], debug=self.debug)
+                    # Set the resource in fthe cfn_model to the new parsed object
+                    cfn_model.resources[r] = resource_parser.parse(cfn_model, cfn_model.resources[r], debug=self.debug)
 
 
         if self.debug:
-            print('done parsing the cfn model')
+            print('done parsing the cfn model'+lineno())
 
         return cfn_model
 
@@ -348,9 +367,15 @@ class CfnParser:
                     print('resource name: '+str(resource_name)+lineno())
                     print("#################################################\n")
 
+                # We are trying to get the aws security group rule type
+                if 'type' in cfn_hash['resource'][resource_type][resource_name]:
+                    sub_type = cfn_hash['resource'][resource_type][resource_name]['type']
+                else:
+                    sub_type = None
+
                 # Create a new resource class based on the name of the resource
                 # Does this by getting the resource type, and creating object based on resource type
-                resource_class = self.class_from_type_name(resource_type,resource_name)
+                resource_class = self.class_from_type_name(resource_type,resource_name,sub_type)
 
                 if self.debug:
                     print("\n###########################################")
@@ -374,7 +399,7 @@ class CfnParser:
                     print("Assigning fields based upon properties"+lineno())
                     print("###############################################\n")
 
-                resource_class = self.assign_fields_based_upon_properties(resource_class, cfn_hash['resource'][resource_type][resource_name])
+                resource_class = self.assign_fields_based_upon_properties(cfn_model, resource_class, cfn_hash['resource'][resource_type][resource_name])
 
                 if self.debug:
                     print('There fields are no assigned to properties'+lineno())
@@ -414,11 +439,13 @@ class CfnParser:
         """
 
         if self.debug:
+            print("\n#####################################################")
             print('CfnParser - transform_hash_into_parameters'+lineno())
             print('cfn_hash: '+str(cfn_hash)+lineno())
             print('type hash: '+str(type(cfn_hash))+lineno())
             print('cfn_model- raw model: '+str(cfn_model.raw_model)+lineno())
-
+            input('Press Enter to continue '+lineno())
+            print("#######################################################\n")
 
         if type(cfn_hash) == type(str()):
             json_acceptable_string = cfn_hash.replace("'", "\"")
@@ -706,7 +733,7 @@ class CfnParser:
         if unresolved_refs and len(unresolved_refs)>0:
             raise ParserError("Unresolved logical resource ids: "+str(unresolved_refs))
 
-    def assign_fields_based_upon_properties(self, resource_object, resource):
+    def assign_fields_based_upon_properties(self, cfn_model, resource_object, resource):
         """
         Assign fields in the object based on properties in the resource
         :param resource_object: 
@@ -767,7 +794,7 @@ class CfnParser:
                 print('policy document: '+str(resource_object.policy_document)+lineno())
             if hasattr(resource_object, 'policy'):
                 print('policy document: '+str(resource_object.policy)+lineno())
-            print(vars(resource_object))
+            print(str(vars(resource_object))+lineno())
             print("##################################################\n")
 
         if self.debug:
@@ -775,6 +802,110 @@ class CfnParser:
             print('resource_object vars: '+str(vars(resource_object))+lineno())
 
 
+        if hasattr(resource_object, 'policy_document') and resource_object.policy_document:
+            if self.debug:
+                print('Has policy document:  '+str(resource_object.policy_document)+lineno())
+            matchObj = re.match(r'(.*)(\${)([^}]+)(})(.*)', str(resource_object.policy_document), re.M | re.I)
+
+            if matchObj:
+                if self.debug:
+                    print('found a match '+lineno())
+                prefix = str(matchObj.group(1))
+                lookup = str(matchObj.group(3))
+                suffix=str(matchObj.group(5))
+
+                if self.debug:
+                    print('prefix: '+str(prefix)+lineno())
+                    print('lookup: '+str(lookup)+lineno())
+                    print('suffix: '+str(suffix)+lineno())
+
+                if lookup:
+                    parts = lookup.split('.')
+
+                    if self.debug:
+                        print('parts: ' + str(parts) + lineno())
+                        print('cfn model - raw model: ' + str(cfn_model.raw_model) + lineno())
+
+                    for i in range(len(parts)):
+
+                        if parts[i] in cfn_model.raw_model:
+                            if self.debug:
+                                print('part ' + str(i) + ' ' + str(parts[i]) + ' in cfn model')
+
+                            if parts[i + 1] in cfn_model.raw_model[parts[i]]:
+                                if self.debug:
+                                    print('part ' + str(i + 1) + ' ' + str(parts[i + 1]) + ' in cfn model')
+
+                                if parts[i + 2] in cfn_model.raw_model[parts[i]][parts[i + 1]]:
+                                    if self.debug:
+                                        print('part ' + str(i + 2) + ' ' + str(parts[i + 2]) + ' in cfn model')
+
+                                    raw_policy_document = str(prefix) + str(
+                                        cfn_model.raw_model[parts[i]][parts[i + 1]][parts[i + 2]]) + str(suffix)
+
+                                    if self.debug:
+                                        print('new raw policy is: ' + str(raw_policy_document) + lineno())
+
+                                    resource_object.policy_document = str(raw_policy_document)
+
+                                    break
+
+            else:
+                if self.debug:
+                    print('no match object: '+lineno())
+        elif hasattr(resource_object, 'policy') and resource_object.policy:
+            if self.debug:
+                print('Has policy document: '+str(resource_object.policy)+lineno())
+            matchObj = re.match(r'(.*)(\${)([^}]+)(})(.*)', str(resource_object.policy), re.M | re.I)
+
+            if matchObj:
+                if self.debug:
+                    print('found a match '+lineno())
+                prefix = str(matchObj.group(1))
+                lookup = str(matchObj.group(3))
+                suffix=str(matchObj.group(5))
+
+                if self.debug:
+                    print('prefix: '+str(prefix)+lineno())
+                    print('lookup: '+str(lookup)+lineno())
+                    print('suffix: '+str(suffix)+lineno())
+
+                if lookup:
+                    parts = lookup.split('.')
+
+                    if self.debug:
+                        print('parts: ' + str(parts) + lineno())
+                        print('cfn model - raw model: ' + str(cfn_model.raw_model) + lineno())
+
+                    for i in range(len(parts)):
+
+                        if parts[i] in cfn_model.raw_model:
+                            if self.debug:
+                                print('part ' + str(i) + ' ' + str(parts[i]) + ' in cfn model')
+
+                            if parts[i + 1] in cfn_model.raw_model[parts[i]]:
+                                if self.debug:
+                                    print('part ' + str(i + 1) + ' ' + str(parts[i + 1]) + ' in cfn model')
+
+                                if parts[i + 2] in cfn_model.raw_model[parts[i]][parts[i + 1]]:
+                                    if self.debug:
+                                        print('part ' + str(i + 2) + ' ' + str(parts[i + 2]) + ' in cfn model')
+
+                                    raw_policy_document = str(prefix) + str(
+                                        cfn_model.raw_model[parts[i]][parts[i + 1]][parts[i + 2]]) + str(suffix)
+
+                                    if self.debug:
+                                        print('new raw policy is: ' + str(raw_policy_document) + lineno())
+
+                                    resource_object.policy = str(raw_policy_document)
+
+                                    break
+            else:
+                if self.debug:
+                    print('no match object: '+lineno())
+        else:
+            if self.debug:
+                print('Does not have a policy document '+lineno())
 
         return resource_object
 
@@ -806,7 +937,7 @@ class CfnParser:
 
         return string
 
-    def class_from_type_name(self, type_name, cfn_model):
+    def class_from_type_name(self, type_name, cfn_model, sub_type=None):
         """
         Create class from type name
         :param type_name: 
@@ -817,12 +948,13 @@ class CfnParser:
         if self.debug:
             print('CfnParser - class_from_type_name'+lineno())
             print('type_name: '+str(type_name)+lineno())
+            print('sub_type: '+str(sub_type)+lineno())
 
-        resource_class = self.generate_resource_class_from_type(type_name,cfn_model)
+        resource_class = self.generate_resource_class_from_type(type_name,cfn_model, sub_type)
 
         return resource_class
 
-    def generate_resource_class_from_type(self, type_name, cfn_model):
+    def generate_resource_class_from_type(self, type_name, cfn_model, sub_type=None):
         """
         Generate resource class from type
         :param type_name: 
@@ -836,6 +968,7 @@ class CfnParser:
             print('generate_resource_class_from_type'+lineno())
             print('cfn model: '+str(cfn_model)+lineno())
             print('type name: '+str(type_name)+lineno())
+            print('sub_type: '+str(sub_type)+lineno())
             print("###################################################\n")
 
 
@@ -871,13 +1004,26 @@ class CfnParser:
             'aws_iam_group',
             'aws_s3_bucket_policy'
             'aws_sqs_queue_policy',
-            'aws_iam_policy_attachment'
+            'aws_iam_policy_attachment',
+            'aws_sns_topic_policy'
         ]
         module_name = 'AWS'
 
         if type_name == 'aws_iam_policy_attachment':
             short_name = 'IAMManagedPolicy'
 
+            if self.debug:
+                print('short_name: '+str(short_name)+lineno())
+        elif type_name == 'aws_security_group_rule' and sub_type == 'egress':
+            short_name = 'EC2SecurityGroupEgress'
+            if self.debug:
+                print('short_name: '+str(short_name)+lineno())
+        elif type_name == 'aws_security_group_rule' and sub_type == 'ingress':
+            short_name = 'EC2SecurityGroupIngress'
+            if self.debug:
+                print('short_name: ' + str(short_name) + lineno())
+        elif type_name == 'aws_sns_topic_policy':
+            short_name = 'SNSTopicPolicy'
             if self.debug:
                 print('short_name: '+str(short_name)+lineno())
         elif type_name == 'aws_sqs_queue_policy':
@@ -983,7 +1129,7 @@ class CfnParser:
             else:
 
                 if self.debug:
-                    print('type: '+str(type_name)+' not a resource we are concered with.  Making generic model')
+                    print('type: '+str(type_name)+' not a resource we are concered with.  Making generic model'+lineno())
 
                 resource_class = ModelElement.ModelElement(cfn_model)
                 setattr(resource_class, '__name__', type_name)

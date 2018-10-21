@@ -17,3 +17,23 @@ resource "aws_db_instance" "default" {
   password             = "foobarbaz"
   parameter_group_name = "default.mysql5.7"
 }
+
+
+#{
+#  "Parameters": {
+#    "Password": {
+#      "Type": "String"
+#    }
+#  },
+#  "Resources": {
+#    "BadDb3": {
+#      "Type": "AWS::RDS::DBInstance",
+#      "Properties": {
+#        "SourceDBInstanceIdentifier": "sampleDbInstance",
+#        "MasterUserPassword": {
+#          "Ref": "Password"
+#        }
+#      }
+#    }
+#  }
+#}

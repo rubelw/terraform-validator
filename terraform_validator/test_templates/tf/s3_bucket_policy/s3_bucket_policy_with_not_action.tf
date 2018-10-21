@@ -31,3 +31,39 @@ resource "aws_s3_bucket_policy" "b" {
 }
 POLICY
 }
+
+#{
+#  "Resources": {
+#    "S3Bucket" : {
+#      "Type" : "AWS::S3::Bucket",
+#      "Properties" : {
+#        "BucketName" : "fakebucketfakebucket"
+#      }
+#    },
+
+#    "S3BucketPolicyWithNotAction": {
+#      "Type": "AWS::S3::BucketPolicy",
+#      "Properties": {
+#        "Bucket": {
+#          "Ref": "S3Bucket"
+#        },
+#        "PolicyDocument": {
+#          "Statement": [
+#            {
+#              "NotAction": [
+#                "s3:Put*"
+#              ],
+#              "Effect": "Allow",
+#              "Resource": "arn:aws:s3:::fakebucketfakebucket/*",
+#              "Principal": {
+#                "AWS": [
+#                  "156460612806"
+#                ]
+#              }
+#            }
+#          ]
+#        }
+#      }
+#    }
+#  }
+#}

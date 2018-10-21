@@ -64,10 +64,11 @@ class SnsTopicPolicyNotActionRule(BaseRule):
         if len(resources)>0:
               for resource in resources:
                   if self.debug:
+                      print("\n##################################")
                       print('resource: '+str(resource)+lineno())
                       print('vars: '+str(vars(resource))+lineno())
 
-                  if hasattr(resource,'policy_document'):
+                  if hasattr(resource,'policy_document') and resource.policy_document:
 
                       if resource.policy_document:
                             if self.debug:
@@ -75,11 +76,17 @@ class SnsTopicPolicyNotActionRule(BaseRule):
                             if resource.policy_document.allows_not_action():
 
                                 violating_policies.append(str(resource.logical_resource_id))
+                  elif hasattr(resource,'policy') and resource.policy:
+
+                      if resource.policy:
+                            if self.debug:
+                                print('policy: '+str(resource.policy_document))
+                            if resource.policy.allows_not_action():
+
+                                violating_policies.append(str(resource.logical_resource_id))
 
         else:
             if self.debug:
                 print('no violating_policies' + lineno())
-
-
 
         return violating_policies

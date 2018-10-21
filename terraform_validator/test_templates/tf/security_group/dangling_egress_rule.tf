@@ -7,7 +7,7 @@ provider "aws" {
 
 variable test {
   type = "string"
-  default = test
+  default = "test"
 }
 
 resource "aws_security_group_rule" "securityGroupEgress2" {

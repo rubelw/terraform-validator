@@ -6,43 +6,54 @@ provider "aws" {
 }
 
 
+variable somethingSpecial {
+  type = "string"
+  default = "test"
+}
 
-resource "aws_security_group" "allow_all" {
-  name        = "allow_all"
-  description = "Allow all inbound traffic"
-  vpc_id      = "${aws_vpc.main.id}"
 
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+resource "aws_security_group" "sgDualModel" {
+  name        = "sgDualModel"
+  description = "sgDualModel"
+  vpc_id      = "vpc-9f8e9dfa"
 
   egress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-    cidr_blocks     = ["0.0.0.0/0"]
-    prefix_list_ids = ["pl-12c4e678"]
+    from_port       = 34
+    to_port         = 34
+    protocol        = "tcp"
+    cidr_blocks     = ["10.1.2.3/32"]
   }
 }
-Basic usage with tags:
 
-resource "aws_security_group" "allow_all" {
-  name        = "allow_all"
-  description = "Allow all inbound traffic"
+resource "aws_security_group_rule" "securityGroupIngress5" {
+  type            = "ingress"
+  from_port       = 45
+  to_port         = 46
+  protocol        = "tcp"
+  cidr_blocks     = ["1.2.3.5/32"]
 
-  ingress {
-    from_port   = 0
-    to_port     = 65535
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  security_group_id = "${aws_security_group.sgDualModel.id}"
+}
 
-  tags {
-    Name = "allow_all"
-  }
+
+resource "aws_security_group_rule" "securityGroupIngressIp6" {
+  type            = "ingress"
+  from_port       = 45
+  to_port         = 46
+  protocol        = "tcp"
+  ipv6_cidr_blocks     = ["2001::/64"]
+
+  security_group_id = "${aws_security_group.sgDualModel.id}"
+}
+
+resource "aws_security_group_rule" "securityGroupIngress" {
+  type            = "ingress"
+  from_port       = 45
+  to_port         = 45
+  protocol        = "tcp"
+  ipv6_cidr_blocks     = ["2001::/99"]
+
+  security_group_id = "sg-12341234"
 }
 
 

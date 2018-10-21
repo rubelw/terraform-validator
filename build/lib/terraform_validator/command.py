@@ -30,6 +30,7 @@ def cli():
 @click.option('--excluded-rules', is_flag=False,default='',help='Comma separated string of rules to exclude')
 @click.option('--suppress-errors','-s',help='Suppress warnings like bad file format, etc', required=False, is_flag=True)
 @click.option('--template-path', '-t', help='base directory to search for templates', required=False)
+@click.option('--template-file', '-f', help='single_template_file', required=False)
 @click.option('--debug',help='Turn on debugging', required=False, is_flag=True)
 @click.option('--rules-directory', '-r', help='Extra rule directory', required=False)
 @click.option('--profile-path', '-o', help='Path to a profile file', required=False)
@@ -41,6 +42,7 @@ def cli():
 @click.option('--use-optional-rules',help='Use optional rules', required=False, is_flag=True)
 def validate(suppress_errors,
              template_path,
+             template_file,
              debug,rules_directory,
              profile_path,
              allow_suppression,
@@ -97,6 +99,7 @@ def validate(suppress_errors,
         start_validate(
             suppress_errors,
             template_path,
+            template_file,
             debug,
             rules_directory,
             profile_path,
@@ -159,6 +162,7 @@ def myversion():
 def start_validate(
         suppress_errors,
         template_path,
+        template_file,
         debug,
         rules_directory,
         profile_path,
@@ -199,6 +203,7 @@ def start_validate(
     config_dict = {}
     config_dict['suppress_errors']=suppress_errors
     config_dict['input_path'] = template_path
+    config_dict['template_file'] = template_file
     config_dict['debug'] = debug
     config_dict['rules_directory'] = rules_directory
     config_dict['profile'] = profile_path

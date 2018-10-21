@@ -34,3 +34,12 @@ resource "aws_iam_user_policy" "lb_ro" {
 }
 EOF
 }
+
+
+#{
+#  "Resources": {
+#    "myuser2": {
+#      "Type": "AWS::IAM::User"
+#    }
+#  }
+#}

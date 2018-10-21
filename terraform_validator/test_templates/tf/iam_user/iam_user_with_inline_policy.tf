@@ -34,3 +34,25 @@ resource "aws_iam_user_policy" "lb_ro" {
 }
 EOF
 }
+
+
+#{
+#  "Resources": {
+#    "userWithInline": {
+#      "Type": "AWS::IAM::User",
+#      "Properties": {
+#        "Groups": ["group1"],
+#        "Policies": [
+#          {
+#            "PolicyDocument": {
+#              "Effect": "Allow",
+#              "Resource": "arn:something",
+#              "Action": "s3:dosomething"
+#            },
+#            "PolicyName" : "somePolicy"
+#          }
+#        ]
+#      }
+#    }
+#  }
+#}

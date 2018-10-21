@@ -185,7 +185,10 @@ class CfnModel:
             "AWS::IAM::Group": 'aws_iam_group',
             "AWS::S3::BucketPolicy": 'aws_s3_bucket_policy',
             "AWS::SQS::QueuePolicy":'aws_sqs_queue_policy',
-            "AWS::IAM::ManagedPolicy":'aws_iam_policy_attachment'
+            "AWS::IAM::ManagedPolicy":'aws_iam_policy_attachment',
+            "AWS::SNS::TopicPolicy": 'aws_sns_topic_policy',
+            "AWS::EC2::SecurityGroupIngress": 'aws_security_group_rule',
+            "AWS::EC2::SecurityGroupEgress": 'aws_security_group_rule'
         }
 
         if resource_type in resource_map:
@@ -212,10 +215,25 @@ class CfnModel:
                 print("############################################################\n")
 
             if str(self.resources[resource].resource_type) == str(resource_type):
-                if self.debug:
-                    print(' ### FOUND MATCHING RESOURCE TYPE '+lineno())
 
-                resources.append(self.resources[resource])
+                if resource_type == 'aws_security_group_rule':
+                    if str(original_resource_type) =='AWS::EC2::SecurityGroupIngress':
+
+                        resources.append(self.resources[resource])
+                        if self.debug:
+                            print(' ### FOUND MATCHING RESOURCE TYPE - type: ' + str(resource_type) + lineno())
+
+                    elif str(original_resource_type) == 'AWS::EC2::SecurityGroupEgress':
+
+                        resources.append(self.resources[resource])
+                        if self.debug:
+                            print(' ### FOUND MATCHING RESOURCE TYPE - type: ' + str(resource_type) + lineno())
+
+                else:
+                    if self.debug:
+                        print(' ### FOUND MATCHING RESOURCE TYPE - type: '+str(resource_type)+lineno())
+
+                    resources.append(self.resources[resource])
 
         if self.debug:
             print('CfnModel - resources_by_type - returning resource'+lineno())

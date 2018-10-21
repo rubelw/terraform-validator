@@ -32,7 +32,17 @@ class SecurityGroupParser:
             print('parse'+lineno())
 
         security_group = copy.copy(resource)
+
+        if debug:
+            print("\n############################")
+            print('Trying to objectify egress')
+            print("###############################\n")
         security_group = SecurityGroupParser.objectify_egress(cfn_model, security_group, debug=debug)
+
+        if debug:
+            print("\n############################")
+            print('Trying to objectify ingress')
+            print("###############################\n")
         security_group = SecurityGroupParser.objectify_ingress(cfn_model, security_group, debug=debug)
 
 
@@ -71,7 +81,7 @@ class SecurityGroupParser:
 
 
             # If there is a ingress in properties
-            if security_group.ingress:
+            if hasattr(security_group,'ingress') and security_group.ingress:
 
                 if debug:
                     print('has securitygroupingress property'+lineno())
@@ -161,6 +171,12 @@ class SecurityGroupParser:
                     print(str('type: ')+str(type(security_group.ingress)+lineno()))
                     sys.exit(1)
 
+            else:
+                if debug:
+                    print('there is no security group ingress '+lineno())
+
+        return security_group
+
     @staticmethod
     def objectify_egress(cfn_model, security_group, debug=False):
         """
@@ -185,16 +201,19 @@ class SecurityGroupParser:
                 print('vars: '+str(vars(security_group))+lineno())
                 print('model: '+str(security_group.cfn_model)+lineno())
                 print("###########################################\n")
+                input('Press Enter to continue: '+lineno())
 
 
-            print(str(security_group.logical_resource_id)+lineno())
-            print(str(security_group.egress)+lineno())
-            if security_group.egress:
-                print(str(security_group.egress)+lineno())
+            if debug:
+                print(str(security_group.logical_resource_id)+lineno())
+                if hasattr(security_group,'egress'):
+                    print(str(security_group.egress)+lineno())
+                    if security_group.egress:
+                        print(str(security_group.egress)+lineno())
 
 
             # If there is a egress property
-            if security_group.egress:
+            if hasattr(security_group,'egress') and security_group.egress:
 
                 if type(security_group.egress) == type(str()):
                     json_acceptable_string = security_group.egress.replace("'", "\"")
@@ -249,7 +268,7 @@ class SecurityGroupParser:
                         print(str(security_group.egress)+lineno())
                     # {'CidrIp': '10.1.2.3/32', 'FromPort': 34, 'ToPort': 36, 'IpProtocol': 'tcp'}
 
-                    egress_object = EC2SecurityGroupIngress(cfn_model)
+                    egress_object = EC2SecurityGroupEgress(cfn_model)
                     egress_object.logical_resource_id = security_group.logical_resource_id
 
                     # Iterate over each key-value pair in the dictionary and create
@@ -282,6 +301,9 @@ class SecurityGroupParser:
                     print('Security group is not egress')
                     print("################################\n")
 
+            else:
+                if debug:
+                    print('does not have egress attribute: '+lineno())
         else:
             if debug:
                 print('no security group'+lineno())
@@ -319,7 +341,7 @@ class SecurityGroupParser:
 
         if not security_group:
 
-            if self.debug:
+            if debug:
                 print('there is not a security group returning'+lineno())
 
             return security_group
@@ -336,34 +358,43 @@ class SecurityGroupParser:
                 print('security_group_ingress: '+str(security_group_ingress)+lineno())
                 print('vars: '+str(vars(security_group_ingress))+lineno())
                 print('dirs: '+str(dir(security_group_ingress))+lineno())
-                if security_group.ingress:
+                if hasattr(security_group_ingress,'ingress') and security_group.ingress:
                     print('ingress: '+str(security_groupingress.ingress)+lineno())
                 print("##############################################################\n")
 
-            if security_group_ingress.ingress:
+            if hasattr(security_group_ingress,'type'):
                 if debug:
-                    print('security group ingress cfn model has properties'+lineno())
-                if security_group_ingress.logical_resource_id:
+                    print('type is: '+str(security_group_ingress.type)+lineno())
+
+                if security_group_ingress.type == 'ingress':
                     if debug:
-                        print('security group ingress has groupid '+str(security_group_ingress.logical_resource_id)+lineno())
+                        print('security group ingress cfn model has properties'+lineno())
+                    if security_group_ingress.logical_resource_id:
+                        if debug:
+                            print('security group ingress has groupid '+str(security_group_ingress.logical_resource_id)+lineno())
 
-                    group_id = References.resolve_security_group_id(security_group_ingress.logical_resource_id,debug=debug)
-                    if debug:
-                        print('group id: '+str(group_id)+lineno())
-                        print('security group logical resource id: '+str(security_group_ingress.logical_resource_id)+lineno())
+                        group_id = References.resolve_security_group_id(security_group_ingress.logical_resource_id,debug=debug)
+                        if debug:
+                            print('group id: '+str(group_id)+lineno())
+                            print('security group logical resource id: '+str(security_group_ingress.logical_resource_id)+lineno())
 
-                    # standalone ingress rules are legal - referencing an external security group
-                    if not group_id:
-                        continue
+                        # standalone ingress rules are legal - referencing an external security group
+                        if not group_id:
+                            continue
 
-                    # If the group id in the standalone ingress matches the logical resource id
-                    # of the actual security group
-                    if security_group_ingress.ingress:
-                        security_group.ingresses.append(security_group_ingress)
+                        # If the group id in the standalone ingress matches the logical resource id
+                        # of the actual security group
+                        #FIXME
+                        if hasattr(security_group_ingress,'ingress') and security_group_ingress.ingress:
+                            security_group.ingresses.append(security_group_ingress)
 
-                else:
-                    print('Security group ingress has no groupid')
-                    sys.exit(1)
+
+                    else:
+                        print('Security group ingress has no groupid')
+                        sys.exit(1)
+            else:
+                if debug:
+                    print('does not have type'+lineno())
 
         if debug:
             print('done wiring_ingress_rules_to_security_group '+lineno())
@@ -395,7 +426,7 @@ class SecurityGroupParser:
                 print("###############################\n")
 
         #egress_rules = cfn_model.resources_by_type('AWS::EC2::SecurityGroupEgress')
-        egress_rules = cfn_model.resources_by_type('AWS::EC2::SecurityGroup')
+        egress_rules = cfn_model.resources_by_type('AWS::EC2::SecurityGroupEgress')
 
         if debug:
             print('egress rules: '+str(egress_rules)+lineno())
@@ -406,32 +437,45 @@ class SecurityGroupParser:
             if debug:
                 print("\n\n###########################################################")
                 print('Standalone egress resource')
-                print('security_group_egress: '+str(security_group_egress)+lineno())
-                print('vars: '+str(vars(security_group_egress))+lineno())
-                print('dirs: '+str(dir(security_group_egress))+lineno())
-                if security_group.egress:
-                    print('egress: '+str(security_group.egress)+lineno())
+                print('vars: ' + str(vars(security_group_egress)) + lineno())
+
+                if hasattr(security_group_egress,'egress'):
+                    print('security_group_egress: '+str(security_group_egress)+lineno())
+                    print('vars: '+str(vars(security_group_egress))+lineno())
+                    print('dirs: '+str(dir(security_group_egress))+lineno())
+
+                    if hasattr(security_group_egress,'egress') and security_group.egress:
+                        print('egress: '+str(security_group.egress)+lineno())
                 print("##############################################################\n")
 
-            if security_group_egress.egress:
-                print('security group egress cfn model has properties'+lineno())
+            if hasattr(security_group_egress,'type'):
+                if debug:
+                    print('type is: '+str(security_group_egress.type)+lineno())
 
-                if security_group_egress.logical_resource_id:
-                    print('security group ingress has groupid '+str(security_group_egress.logical_resource_id)+lineno())
+                if security_group_egress.type == 'egress':
 
-                    group_id = References.resolve_security_group_id(security_group_egress.logical_resource_id,debug=debug)
-                    if debug:
-                        print('group id: '+str(group_id)+lineno())
-                        print('security group logical resource id: '+str(security_group_egress.logical_resource_id)+lineno())
+                    if security_group_egress.logical_resource_id:
+                        print('security group ingress has groupid '+str(security_group_egress.logical_resource_id)+lineno())
 
-                    # standalone egress rules are legal - referencing an external security group
-                    if not group_id:
-                        continue
+                        group_id = References.resolve_security_group_id(security_group_egress.logical_resource_id,debug=debug)
+                        if debug:
+                            print('group id: '+str(group_id)+lineno())
+                            print('security group logical resource id: '+str(security_group_egress.logical_resource_id)+lineno())
 
-                    # If the group id in the standalone egress matches the logical resource id
-                    # of the actual security group
-                    if security_group_egress.egress:
-                        security_group.egresses.append(security_group_egress)
+                        # standalone egress rules are legal - referencing an external security group
+                        if not group_id:
+                            continue
 
+                        # If the group id in the standalone egress matches the logical resource id
+                        # of the actual security group
+                        if hasattr(security_group_egress,'egress') and security_group_egress.egress:
+                            security_group.egresses.append(security_group_egress)
+
+                    else:
+                        print('Security group ingress has no groupid')
+                        sys.exit(1)
+            else:
+                if debug:
+                    print('does not have type'+lineno())
 
         return security_group

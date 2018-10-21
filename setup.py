@@ -50,7 +50,8 @@ setup(
         "schema>=0.6.8",
         "future>=0.16.0",
         "six>=1.11.0",
-        "pip"
+        "pip",
+        "botocore"
     ],
     keywords=['validation', 'schema', 'dictionaries','aws','cloudformation','python','rules','linter'],
     classifiers=[

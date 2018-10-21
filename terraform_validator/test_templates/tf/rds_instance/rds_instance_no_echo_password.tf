@@ -18,3 +18,22 @@ resource "aws_db_instance" "default" {
   parameter_group_name = "default.mysql5.7"
 }
 
+#{
+#  "Parameters": {
+#    "Password": {
+#      "Type": "String",
+#      "NoEcho": "true"
+#    }
+#  },
+#  "Resources": {
+#    "GoodDb": {
+#      "Type": "AWS::RDS::DBInstance",
+#      "Properties": {
+#        "SourceDBInstanceIdentifier": "sampleDbInstance",
+#        "MasterUserPassword": {
+#          "Ref": "Password"
+#        }
+#      }
+#    }
+#  }
+#}

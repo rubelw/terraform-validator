@@ -5,6 +5,16 @@ provider "aws" {
   region     = "us-east-1"
 }
 
+variable "aws_access_key" {
+  type = "string"
+  default = "xx"
+
+}
+
+variable "aws_secret_key" {
+  type = "string"
+  default = "xx"
+}
 
 resource "aws_security_group_rule" "danglingIngress" {
   type            = "ingress"

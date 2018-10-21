@@ -1,3 +1,5 @@
 {
+  "test/test_ebs_custom_tags.py::TestEbsVolume::test_ebs_volume_missing_one_tags": true,
+  "test/test_ebs_custom_tags.py::TestEbsVolume::test_ebs_volume_no_tags": true,
   "test/test_sns_policy.py::TestSnsPolicy::test_sns_policy": true
 }

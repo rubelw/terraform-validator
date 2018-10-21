@@ -68,14 +68,27 @@ class SnsTopicPolicyWildcardPrincipalRule(BaseRule):
                     print('resource: '+str(resource)+lineno())
                     print("##############################################\n")
 
-                if hasattr(resource,'policy_document'):
+                if hasattr(resource,'policy_document') and resource.policy_document:
                     if self.debug:
-                        print('has policy document '+lineno())
+                        print('has policy document: '+str(resource.policy_document)+lineno())
                     if resource.policy_document:
                         if self.debug:
-                            print('vars: '+str(vars(resource.policy_document))+lineno())
+                            print('policy: '+str(resource.policy_document)+lineno())
 
                         if resource.policy_document.wildcard_allowed_principals(debug=self.debug):
+                            if self.debug:
+                                print('has allows wildcard principals'+lineno())
+                                print('resource id:'+str(resource.logical_resource_id)+lineno())
+
+                            logical_resource_ids.append(str(resource.logical_resource_id))
+                elif hasattr(resource,'policy') and resource.policy:
+                    if self.debug:
+                        print('has policy document '+lineno())
+                    if resource.policy:
+                        if self.debug:
+                            print('policy: '+str(resource.policy)+lineno())
+
+                        if resource.policy.wildcard_allowed_principals(debug=self.debug):
                             if self.debug:
                                 print('has allows wildcard principals'+lineno())
                                 print('resource id:'+str(resource.logical_resource_id)+lineno())
@@ -85,6 +98,5 @@ class SnsTopicPolicyWildcardPrincipalRule(BaseRule):
         else:
             if self.debug:
                 print('no violating_policies' + lineno())
-
 
         return logical_resource_ids

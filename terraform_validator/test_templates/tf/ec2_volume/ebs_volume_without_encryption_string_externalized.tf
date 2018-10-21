@@ -5,11 +5,22 @@ provider "aws" {
   region     = "us-east-1"
 }
 
+variable "Encryption" {
+  type = "string"
+}
 
-resource "aws_ebs_volume" "example" {
-    availability_zone = "us-west-2a"
-    size = 40
+
+resource "aws_ebs_volume" "NewVolume" {
+    availability_zone = "us-east-1c"
+    size = 100
+    type = "io1"
+    iops = 100
+    encrypted = ${var.Enryption}
     tags {
-        Name = "HelloWorld"
+        ResourceOwner = "resourceowner"
+        DeployedBy = "deployedby"
+        Name = "name"
+        Project = "project"
     }
 }
+
