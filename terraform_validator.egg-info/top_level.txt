@@ -1,3 +1,0 @@
-terraform_model
-terraform_validator
-test
