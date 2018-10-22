@@ -71,7 +71,7 @@ class RDSInstanceMasterUsernameRule(BaseRule):
                   print('resource: '+str(resource)+lineno())
                   print('resource: '+str(vars(resource))+lineno())
 
-              if hasattr(resource,'masterUsername'):
+              if hasattr(resource,'masterUsername') and resource.masterUsername:
                   if self.debug:
                       print('has masterUsername resource')
                   if resource.masterUsername:
@@ -82,9 +82,20 @@ class RDSInstanceMasterUsernameRule(BaseRule):
                       if self.debug:
                           print('violating_rdsinstances: ' + str(violating_rdsinstances) + lineno())
 
+              elif hasattr(resource,'username') and resource.username:
+                  if self.debug:
+                      print('has username resource')
+                  if resource.username:
+
+                      if not self.references_no_echo_parameter_without_default(self.cfn_model,resource.username):
+                          violating_rdsinstances.append(str(resource.logical_resource_id))
+
+                      if self.debug:
+                          print('violating_rdsinstances: ' + str(violating_rdsinstances) + lineno())
       else:
           if self.debug:
               print('no violating_rdsinstances' + lineno())
+
 
 
       return violating_rdsinstances
@@ -135,5 +146,4 @@ class RDSInstanceMasterUsernameRule(BaseRule):
     if self.debug:
       print('Does not have noecho property '+lineno())
 
-    sys.exit(1)
     return False

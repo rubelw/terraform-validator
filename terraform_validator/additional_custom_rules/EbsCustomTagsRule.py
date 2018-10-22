@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function
 import inspect
 import sys
+import json
 from terraform_validator.custom_rules.BaseRule import BaseRule
 from collections import Iterable
 from six import StringIO, string_types
@@ -87,16 +88,26 @@ class EbsCustomTagsRule(BaseRule):
             for resource in resources:
                 if self.debug:
                     print('resource: ' + str(resource) + lineno())
-                    print('vars: ' + str(vars(resource)))
+                    print('vars: ' + str(vars(resource))+lineno())
 
-                if hasattr(resource, 'tags'):
+                if hasattr(resource, 'tags') and resource.tags:
                     if self.debug:
                         print('has tags attribute' + lineno())
 
-                    tags_dict = self.tags_to_dict(resource.cfn_model['Properties']['Tags'])
+                    if type(resource.tags) == type(str()):
+                        json_acceptable_string = resource.tags.replace("'", "\"")
+                        resource.tags = json.loads(json_acceptable_string)
 
+                    if self.debug:
+                        print('tags dict: '+str(resource.tags)+lineno())
+
+                    #tags_dict = self.tags_to_dict(resource.cfn_model['Properties']['Tags'])
+                    tags_dict = list(resource.tags.keys())
                     required_tags = ('Name', 'ResourceOwner', 'DeployedBy', 'Project')
                     if not set(required_tags).issubset(tags_dict):
+
+                        if self.debug:
+                            print('missing required tags: '+lineno())
                         violating_volumes.append(str(resource.logical_resource_id))
                 else:
                     if self.debug:
@@ -106,5 +117,6 @@ class EbsCustomTagsRule(BaseRule):
         else:
             if self.debug:
                 print('no violating_volumes' + lineno())
+
 
         return violating_volumes

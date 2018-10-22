@@ -64,8 +64,9 @@ class LambdaPermissionInvokeFunctionActionRule(BaseRule):
       for resource in resources:
           if self.debug:
             print('resource: '+str(resource)+lineno())
+            print('vars: '+str(vars(resource))+lineno())
 
-          if hasattr(resource, 'lambda_permission'):
+          if hasattr(resource, 'lambda_permission') and resource.lambda_permission:
             if self.debug:
               print('has lambda permission ' + lineno())
 
@@ -75,7 +76,16 @@ class LambdaPermissionInvokeFunctionActionRule(BaseRule):
                 print('Lambda action not invokefunction')
 
               violating_lambdas.append(str(resource.logical_resource_id))
+          elif hasattr(resource, 'action') and resource.action:
+            if self.debug:
+              print('has lambda permission action ' + lineno())
 
+              print(resource.action)
+            if resource.action != 'lambda:InvokeFunction':
+              if self.debug:
+                print('Lambda action not invokefunction')
+
+              violating_lambdas.append(str(resource.logical_resource_id))
     else:
       if self.debug:
         print('no violating_lambda' + lineno())

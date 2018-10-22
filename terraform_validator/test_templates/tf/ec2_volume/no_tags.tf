@@ -14,6 +14,7 @@ resource "aws_ebs_volume" "NewVolume" {
     encrypted = true
     tags {
         Name = "HelloWorld"
+        Project = "project"
     }
 }
 

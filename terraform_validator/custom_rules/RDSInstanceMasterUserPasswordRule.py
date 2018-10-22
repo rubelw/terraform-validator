@@ -68,7 +68,7 @@ class RDSInstanceMasterUserPasswordRule(BaseRule):
             print('resource: '+str(resource)+lineno())
             print('vars:'+str(vars(resource))+lineno())
 
-          if hasattr(resource,'masterUserPassword'):
+          if hasattr(resource,'masterUserPassword') and resource.masterUserPassword:
 
             if resource.masterUserPassword:
 
@@ -77,7 +77,15 @@ class RDSInstanceMasterUserPasswordRule(BaseRule):
 
               if self.debug:
                 print('violating_rdsinstances: ' + str(violating_rdsinstances) + lineno())
+          elif hasattr(resource,'password') and resource.password:
 
+            if resource.password:
+
+              if not self.references_no_echo_parameter_without_default(self.cfn_model,resource.password):
+                 violating_rdsinstances.append(str(resource.logical_resource_id))
+
+              if self.debug:
+                print('violating_rdsinstances: ' + str(violating_rdsinstances) + lineno())
     else:
       if self.debug:
         print('no violating_rdsinstances' + lineno())
@@ -125,5 +133,5 @@ class RDSInstanceMasterUserPasswordRule(BaseRule):
     if self.debug:
       print('Does not have noecho property '+lineno())
 
-    sys.exit(1)
+
     return False

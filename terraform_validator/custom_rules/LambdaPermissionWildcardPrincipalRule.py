@@ -75,10 +75,13 @@ class LambdaPermissionWildcardPrincipalRule(BaseRule):
               print(resource.principal)
             if LambdaPrincipal.wildcard(resource.principal):
               violating_lambdas.append(str(resource.logical_resource_id))
-
+            else:
+              if self.debug:
+                print('principal does not have wildcard: '+lineno())
     else:
       if self.debug:
         print('no violating_lambda' + lineno())
+
 
 
     return violating_lambdas

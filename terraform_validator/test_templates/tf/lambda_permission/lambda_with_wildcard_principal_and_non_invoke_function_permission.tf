@@ -91,25 +91,21 @@ resource "aws_lambda_permission" "lambdaPermission2" {
 
 resource "aws_iam_role" "LambdaExecutionRole" {
   name = "LambdaExecutionRole"
-  path = '/'
+  path = "/"
   assume_role_policy = "${data.aws_iam_policy_document.example.json}"
-
+}
 
 data "aws_iam_policy_document" "example" {
   statement {
     effect = "allow"
-    actions = [
-      "logs:*",
-    ],
+    actions = ["logs:*"]
     resources = [
      "arn:aws:logs:*:*:*"
     ]
   }
   statement {
     effect = "allow"
-    actions = [
-      "sts:AssumeRole",
-    ],
+    actions = ["sts:AssumeRole"]
     principals {
       type        = "Service"
       identifiers = ["lambda.amazonaws.com"]

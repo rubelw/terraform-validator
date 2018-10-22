@@ -192,7 +192,9 @@ class CfnModel:
             "AWS::S3::Bucket":'aws_s3_bucket',
             "AWS::RDS::DBInstance":'aws_db_instance',
             "AWS::CloudFront::Distribution": 'aws_cloudfront_distribution',
-            "AWS::IAM::UserToGroupAddition":'aws_iam_policy_attachment'
+            "AWS::IAM::UserToGroupAddition":'aws_iam_policy_attachment',
+            "AWS::Lambda::Permission":'aws_lambda_permission',
+            "AWS::EC2::Volume":'aws_ebs_volume'
         }
 
         if resource_type in resource_map:
