@@ -40,6 +40,12 @@ class TestRdsInstance(unittest.TestCase):
                 'failure_count': '0',
                 'filename': '/tf/rds_instance/rds_instances_with_public_credentials.tf',
                 'file_results': [
+                    {
+                        "id": "W1",
+                        "type": "VIOLATION::WARNING",
+                        "message": "Specifying credentials in the template itself is probably not the safest thing",
+                        "logical_resource_ids": ["provider"]
+                    }
                 ]
             }
         ]
@@ -107,6 +113,12 @@ class TestRdsInstance(unittest.TestCase):
                         'type': 'VIOLATION::FAILING_VIOLATION',
                         'message': 'RDS instance master user password must be Ref to NoEcho Parameter. Default credentials are not recommended',
                         'logical_resource_ids': "['BadDb1', 'BadDb2']"
+                    },
+                    {
+                        "id": "W1",
+                        "type": "VIOLATION::WARNING",
+                        "message": "Specifying credentials in the template itself is probably not the safest thing",
+                        "logical_resource_ids": ["provider"]
                     }
                 ]
             }

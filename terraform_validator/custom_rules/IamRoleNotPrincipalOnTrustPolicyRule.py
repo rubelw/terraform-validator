@@ -82,9 +82,10 @@ class IamRoleNotPrincipalOnTrustPolicyRule(BaseRule):
           elif hasattr(resource, 'policy') and resource.policy:
             if self.debug:
               print('has policy document ' + lineno())
+              print('vars: '+str(resource.policy)+lineno())
 
-              print(resource.policy.policy.statements)
-            if resource.policy.policy.allows_not_principal():
+
+            if resource.policy.allows_not_principal():
                 if self.debug:
                   print('has allows not principal')
 

@@ -60,6 +60,12 @@ class TestSnsPolicy(unittest.TestCase):
                         'type': 'VIOLATION::FAILING_VIOLATION',
                         'message': 'SNS topic policy should not allow * principal',
                         'logical_resource_ids': "['mysnspolicy0', 'mysnspolicy1', 'mysnspolicy2', 'mysnspolicy3']"
+                    },
+                    {
+                        'id': 'W1',
+                        'type': 'VIOLATION::WARNING',
+                        'message': 'Specifying credentials in the template itself is probably not the safest thing',
+                        'logical_resource_ids': ['provider']
                     }
                 ]
             }
@@ -77,6 +83,12 @@ class TestSnsPolicy(unittest.TestCase):
                                 'type': 'VIOLATION::FAILING_VIOLATION',
                                 'message': 'SNS topic policy should not allow * principal',
                                 'logical_resource_ids': "['mysnspolicy0', 'mysnspolicy1', 'mysnspolicy2', 'mysnspolicy3']"
+                            },
+                            {
+                                'id': 'W1',
+                                'type': 'VIOLATION::WARNING',
+                                'message': 'Specifying credentials in the template itself is probably not the safest thing',
+                                'logical_resource_ids': ['provider']
                             }
                         ]
                     }
@@ -128,4 +140,4 @@ class TestSnsPolicy(unittest.TestCase):
         print('expected results: ' + str(expected_result))
         print('real results: ' + str(real_result))
 
-        self.assertEqual(expected_result, real_result)
+        self.assertEqual(json.loads(expected_result), json.loads(real_result))

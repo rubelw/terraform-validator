@@ -58,6 +58,13 @@ class TestSqs(unittest.TestCase):
                 'filename': '/tf/sqs_queue_policy/sqs_policy_with_not_action.tf',
                 'file_results': [
                     {
+                        'id': 'W1',
+                        'type': 'VIOLATION::WARNING',
+                        'message': 'Specifying credentials in the template itself is probably not the safest thing',
+                        'logical_resource_ids': ['provider']
+                    },
+
+                    {
                         'id': 'W18',
                         'type': 'VIOLATION::WARNING',
                         'message': 'SQS Queue policy should not allow Allow+NotAction',
@@ -112,5 +119,5 @@ class TestSqs(unittest.TestCase):
           print('expected results: '+str(expected_result.replace('\'','"').replace('"["','["').replace('"]"','"]')))
 
           self.maxDiff = None
-          self.assertEqual(expected_result.replace('\'','"').replace('"["','["').replace('"]"','"]'), real_result)
+          self.assertEqual(json.loads(expected_result.replace('\'','"').replace('"["','["').replace('"]"','"]')), json.loads(real_result))
 
