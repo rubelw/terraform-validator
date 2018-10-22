@@ -90,7 +90,7 @@ Getting help
 
 ``` {.sourceCode .console}
 $ tf-validator validate --help
-Usage: cfn-validator validate [OPTIONS]
+Usage: tf-validator validate [OPTIONS]
 
   primary function for validating a template :param template_path: :param
   template_file: :param debug: :param rules_directory: :param profile_path:
