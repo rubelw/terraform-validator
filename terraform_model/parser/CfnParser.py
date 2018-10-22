@@ -15,6 +15,7 @@ from terraform_model.model import IAMUser
 from terraform_model.model import IAMGroup
 from terraform_model.model import IAMPolicy
 from terraform_model.model import EC2Instance
+from terraform_model.model import EC2NetworkInterface
 from terraform_model.model import EC2SecurityGroup
 from terraform_model.model import EC2SecurityGroupEgress
 from terraform_model.model import EC2SecurityGroupIngress
@@ -221,9 +222,77 @@ class CfnParser:
             print('Done applying parameter values to model' + lineno())
             print("##################################################\n")
 
+        if self.debug:
+            self.dump_model(cfn_model)
 
         return cfn_model
 
+
+    def dump_model(self,cfn_model):
+
+        print("\n########################################")
+        print('outputs: '+str(cfn_model.outputs)+lineno())
+
+        print("\n########################################")
+        print('locals: '+str(cfn_model.locals)+lineno())
+
+        print("\n########################################")
+        print('providers: '+str(cfn_model.providers)+lineno())
+        for provider in cfn_model.providers:
+            print("\t"+str(provider)+lineno())
+            print("\t\t"+str(cfn_model.providers[provider])+lineno())
+
+            print("\t\t"+'id: '+str(cfn_model.providers[provider].id)+lineno())
+            print("\t\t"+'type: '+str(cfn_model.providers[provider].type)+lineno())
+            print("\t\t"+'instance: '+str(cfn_model.providers[provider].instance_providers)+lineno())
+            print("\t\t"+'vars: '+str(vars(cfn_model.providers[provider])))
+
+            #print('debug: '+str(provider.debug)+lineno())
+
+        print("\n########################################")
+        print('parameters: '+str(cfn_model.parameters)+lineno())
+
+        print("\n########################################")
+        print('data: '+str(cfn_model.data)+lineno())
+
+        print("\n########################################")
+        print('resources: '+str(cfn_model.resources)+lineno())
+        for resource in cfn_model.resources:
+            print("\t\t########################################")
+            print("\t"+str(resource)+lineno())
+            print("\t\t"+'logical_resource_id: '+str(cfn_model.resources[resource].logical_resource_id)+lineno())
+            print("\t\t"+'resource_type: '+str(cfn_model.resources[resource].resource_type)+lineno())
+            if hasattr(cfn_model.resources[resource],'policy_document') and cfn_model.resources[resource].policy_document:
+                print("Has policy document: "+lineno())
+                print("\t\t"+str(cfn_model.resources[resource].policy_document)+lineno())
+                for statement in cfn_model.resources[resource].policy_document.statements:
+                    print("\t\t\t"+str(statement)+lineno())
+
+                    print("\t\t\tactions: "+str(statement.actions)+lineno())
+                    print("\t\t\tnot_actions: " + str(statement.not_actions)+lineno())
+                    print("\t\t\tresources: " + str(statement.resources)+lineno())
+                    print("\t\t\tnot_resources: " + str(statement.not_resources)+lineno())
+                    print("\t\t\tsid: " + str(statement.sid)+lineno())
+                    print("\t\t\teffect: " + str(statement.effect)+lineno())
+                    print("\t\t\tcondition: " + str(statement.condition)+lineno())
+                    print("\t\t\tprincipal: " + str(statement.principal)+lineno())
+                    print("\t\t\tnot_principal: " + str(statement.not_principal)+lineno())
+            if hasattr(cfn_model.resources[resource],'securityGroupIngress') and cfn_model.resources[resource].securityGroupIngress:
+                print("\t\tsecurityGroupIngress: "+str(cfn_model.resources[resource].securityGroupIngress)+lineno())
+            if hasattr(cfn_model.resources[resource],'securityGroupEgress') and cfn_model.resources[resource].securityGroupEgress:
+                print("\t\tsecurityGroupEgress: "+str(cfn_model.resources[resource].securityGroupEgress)+lineno())
+            if hasattr(cfn_model.resources[resource],'ingresses') and cfn_model.resources[resource].ingresses:
+                print("\t\tingresses: "+str(cfn_model.resources[resource].ingresses)+lineno())
+            if hasattr(cfn_model.resources[resource],'egresses') and cfn_model.resources[resource].egresses:
+                print("\t\tegresses: "+str(cfn_model.resources[resource].egresses)+lineno())
+
+
+
+
+            print("\t\t"+'vars: '+str(vars(cfn_model.resources[resource])))
+            #print("\t\t"+'type: '+str(cfn_model.resources[resource].type)+lineno())
+
+        print('raw model: '+str(cfn_model.raw_model)+lineno())
 
     def apply_parameter_values(self, cfn_model, parameter_values_json):
         """

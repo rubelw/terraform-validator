@@ -66,22 +66,15 @@ class CloudFormationAuthenticationRule(BaseRule):
 
 
         # Get the resource type
-        for resource in self.cfn_model.raw_model['resource']:
+        if 'provider' in self.cfn_model.raw_model:
             if self.debug:
-                print('resource: '+str(resource)+lineno())
+                print('has provider '+lineno())
 
 
-            for resource_name in self.cfn_model.raw_model['resource'][resource]:
-                if 'metadata' in self.cfn_model.raw_model['resource'][resource][resource_name]:
-                    if self.debug:
-                        print('found metadata')
 
-                    if 'AWS::CloudFormation::Authentication' in self.cfn_model.raw_model['resource'][resource][resource_name]['metadata']:
-                        if self.debug:
-                            print('has authentication')
 
-                        if self.potentially_sensitive_credentials(self.cfn_model.raw_model['Resources'][resource][resource_name]['metadata']['AWS::CloudFormation::Authentication']):
-                            logical_resource_ids.append(str(resource))
+            if self.potentially_sensitive_credentials(self.cfn_model.raw_model['provider']):
+                logical_resource_ids.append('provider')
 
 
         return logical_resource_ids
@@ -94,6 +87,7 @@ class CloudFormationAuthenticationRule(BaseRule):
         """
         if self.debug:
             print('potentially sensitive credentials'+lineno())
+            print('auth: '+str(auth)+lineno())
 
         # Example
         # "Metadata": {
@@ -109,13 +103,16 @@ class CloudFormationAuthenticationRule(BaseRule):
 
         if type(auth) == type(dict()):
             for item in auth:
+                if self.debug:
+                    print('item: '+str(item)+lineno())
+                    print('type: '+str(type(auth[item]))+lineno())
+                for item2 in auth[item]:
+                    if self.debug:
+                        print('item2: '+str(item2)+lineno())
 
-                if type(auth[item]) == type(dict()):
-
-                    for item2 in auth[item]:
+                    if str(item2) in ['accessKeyId','password','secretKey','access_key','secret_key']:
                         if self.debug:
-                            print('item: '+str(item2))
-                        if str(item2) in ['accessKeyId','password','secretKey']:
-                            return True
+                            print('returning true: '+lineno())
+                        return True
 
         return False

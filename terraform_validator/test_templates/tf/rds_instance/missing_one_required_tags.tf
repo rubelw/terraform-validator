@@ -16,6 +16,21 @@ resource "aws_db_instance" "default" {
   username             = "foo"
   password             = "foobarbaz"
   parameter_group_name = "default.mysql5.7"
+  publicly_accessible = false
+
+  tags {
+    Name        = "ResourceOwner"
+    Environment = "resourceowner"
+  }
+  tags {
+    Name        = "DeployedBy"
+    Environment = "deployedby"
+  }
+  tags {
+    Name        = "Name"
+    Environment = "name"
+  }
+
 }
 
 

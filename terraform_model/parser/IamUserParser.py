@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function
 import inspect
 import sys
+import json
 from terraform_model.parser.PolicyDocumentParser import PolicyDocumentParser
 from terraform_model.model.Policy import Policy
 
@@ -54,6 +55,7 @@ class IamUserParser:
                 iam_user.group_names = user_to_group_addition.groupName
                 #    # we need to figure out the story on resolving Refs i think for this to be real
 
+
         return iam_user
 
 
@@ -69,6 +71,13 @@ class IamUserParser:
             print('user_to_group_addition_has_username'+lineno())
             print('user names: '+str(addition_user_names)+lineno())
             print('user to find: '+str(user_to_find)+lineno())
+
+
+
+        if type(addition_user_names) == type(str()):
+            json_acceptable_string = addition_user_names.replace("'", "\"")
+            addition_user_names= json.loads(json_acceptable_string)
+
 
         for addition_user_name in addition_user_names:
 

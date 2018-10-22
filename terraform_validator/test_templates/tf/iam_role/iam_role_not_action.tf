@@ -6,26 +6,29 @@ provider "aws" {
 }
 
 
-resource "aws_iam_role" "test_role" {
-  name = "test_role"
 
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
+resource "aws_iam_role" "NotActionRole" {
+  name = "WildcardActionRole"
+  path = "/"
+  assume_role_policy = "${data.aws_iam_policy_document.example.json}"
+}
+
+data "aws_iam_policy_document" "example" {
+  statement {
+    effect = "allow"
+    not_actions = ["s3:*"]
+    resources = "*"
+  }
+  statement {
+    effect = "allow"
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
     }
-  ]
-}
-EOF
-}
+  }
 
+}
 
 #{
 #  "AWSTemplateFormatVersion": "2010-09-09",

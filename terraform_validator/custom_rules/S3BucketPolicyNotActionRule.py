@@ -63,21 +63,35 @@ class S3BucketPolicyNotActionRule(BaseRule):
     if len(resources) > 0:
       for resource in resources:
         if self.debug:
+          print("\n\n##########################################")
+          print(str(dir(resource)) + lineno())
           print('resource: ' + str(resource) + lineno())
+          print("##############################################\n")
 
-        if hasattr(resource, 'policy_document'):
 
-          if resource.policy_document:
+        if hasattr(resource, 'policy_document') and resource.policy_document:
+          if self.debug:
+            print('has policy document ' + lineno())
+
+          if self.debug:
+            print(resource.policy_document.statements)
+          if resource.policy_document.allows_not_action():
             if self.debug:
-              print('has policy document ' + lineno())
+              print('has allows not action'+lineno())
 
+            violating_policies.append(str(resource.logical_resource_id))
+
+        elif hasattr(resource, 'policy') and resource.policy:
+          if self.debug:
+            print('has policy document ' + lineno())
+
+          if self.debug:
+            print(resource.policy.statements)
+          if resource.policy.allows_not_action():
             if self.debug:
-              print(resource.policy_document.statements)
-            if resource.policy_document.allows_not_action():
-              if self.debug:
-                print('has allows not action'+lineno())
+              print('has allows not action'+lineno())
 
-              violating_policies.append(str(resource.logical_resource_id))
+            violating_policies.append(str(resource.logical_resource_id))
 
     else:
       if self.debug:

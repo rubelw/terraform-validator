@@ -62,10 +62,14 @@ class S3BucketPolicyWildcardActionRule(BaseRule):
 
     if len(resources) > 0:
       for resource in resources:
-        if self.debug:
-          print('resource: ' + str(resource) + lineno())
 
-        if hasattr(resource, 'policy_document'):
+        if self.debug:
+          print("\n\n##########################################")
+          print(str(dir(resource)) + lineno())
+          print('resource: ' + str(resource) + lineno())
+          print("##############################################\n")
+
+        if hasattr(resource, 'policy_document') and resource.policy_document:
 
           if resource.policy_document:
             if self.debug:
@@ -74,6 +78,20 @@ class S3BucketPolicyWildcardActionRule(BaseRule):
               print(resource.policy_document.statements)
 
             if resource.policy_document.wildcard_allowed_actions():
+              if self.debug:
+                print('has wildcard allowsd actions'+lineno())
+
+              logical_resource_ids.append(str(resource.logical_resource_id))
+
+        elif hasattr(resource, 'policy') and resource.policy:
+
+          if resource.policy:
+            if self.debug:
+              print('has policy ' + lineno())
+
+              print(resource.policy.statements)
+
+            if resource.policy.wildcard_allowed_actions():
               if self.debug:
                 print('has wildcard allowsd actions'+lineno())
 

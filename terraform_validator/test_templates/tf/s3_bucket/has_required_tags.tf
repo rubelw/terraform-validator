@@ -6,13 +6,24 @@ provider "aws" {
 }
 
 
-resource "aws_s3_bucket" "b" {
-  bucket = "my-tf-test-bucket"
-  acl    = "private"
+resource "aws_s3_bucket" "S3Bucket" {
+  bucket = "fakebucketfakebucket2"
 
   tags {
-    Name        = "My bucket"
-    Environment = "Dev"
+    Name        = "ResourceOwner"
+    Environment = "resourceowner"
+  }
+  tags {
+    Name        = "DeployedBy"
+    Environment = "deployedby"
+  }
+  tags {
+    Name        = "Name"
+    Environment = "name"
+  }
+  tags {
+    Name        = "Project"
+    Environment = "project"
   }
 }
 

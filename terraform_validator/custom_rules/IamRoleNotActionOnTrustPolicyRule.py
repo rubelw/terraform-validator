@@ -74,7 +74,7 @@ class IamRoleNotActionOnTrustPolicyRule(BaseRule):
           if self.debug:
             print('resource: '+str(resource)+lineno())
 
-          if hasattr(resource, 'policy_document'):
+          if hasattr(resource, 'policy_document') and resource.policy_document:
             if self.debug:
               print('has policy document ' + lineno())
 
@@ -84,7 +84,25 @@ class IamRoleNotActionOnTrustPolicyRule(BaseRule):
                   print('has allows not action')
 
                 violating_roles.append(str(resource.logical_resource_id))
+          elif hasattr(resource, 'policy') and resource.policy:
+            if self.debug:
+              print('has policy document ' + lineno())
 
+              print(resource.policy.policy.statements)
+            if resource.policy.policy.allows_not_action():
+                if self.debug:
+                  print('has allows not action')
+
+                violating_roles.append(str(resource.logical_resource_id))
+          elif hasattr(resource, 'assume_role_policy_document') and resource.assume_role_policy_document:
+            if self.debug:
+              print('has policy obects ' + lineno())
+
+              if resource.assume_role_policy_document.allows_not_action():
+                if self.debug:
+                  print('has not actions')
+
+                violating_roles.append(str(resource.logical_resource_id))
     else:
       if self.debug:
         print('no violating_roles' + lineno())

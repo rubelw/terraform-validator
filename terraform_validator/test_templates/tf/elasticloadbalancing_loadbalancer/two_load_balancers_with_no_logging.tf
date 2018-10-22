@@ -11,11 +11,6 @@ resource "aws_elb" "bar" {
   name               = "foobar-terraform-elb"
   availability_zones = ["us-west-2a", "us-west-2b", "us-west-2c"]
 
-  access_logs {
-    bucket        = "foo"
-    bucket_prefix = "bar"
-    interval      = 60
-  }
 
   listener {
     instance_port     = 8000

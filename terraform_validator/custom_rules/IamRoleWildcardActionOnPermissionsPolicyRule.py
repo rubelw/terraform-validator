@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function
 import inspect
 import sys
+import json
 from builtins import (str)
 from terraform_validator.custom_rules.BaseRule import BaseRule
 
@@ -71,8 +72,9 @@ class IamRoleWildcardActionOnPermissionsPolicyRule(BaseRule):
       for resource in resources:
           if self.debug:
             print('resource: '+str(resources)+lineno())
+            print('vars: '+str(vars(resource))+lineno())
 
-          if hasattr(resource, 'policy_objects'):
+          if hasattr(resource, 'policy_objects') and resource.policy_objects:
             if self.debug:
               print('has policy obects ' + lineno())
 
@@ -86,6 +88,36 @@ class IamRoleWildcardActionOnPermissionsPolicyRule(BaseRule):
                   print('has wildcard allowed actions')
 
                 violating_roles.append(str(resource.logical_resource_id))
+          elif hasattr(resource, 'policy') and resource.policy:
+            if self.debug:
+              print('has policy obects ' + lineno())
+              print('policy: '+str(resource.policy)+lineno())
+              print('type: '+str(type(resource.policy))+lineno())
+
+            if type(resource.policy) == type(str()):
+              json_acceptable_string = resource.policy.replace("'", "\"")
+              resource.policy = json.loads(json_acceptable_string)
+
+            for policy in resource.policy:
+
+              if self.debug:
+                print('policy: '+str(policy)+lineno())
+
+              if policy.policy.wildcard_allowed_actions():
+                if self.debug:
+                  print('has wildcard allowed actions')
+
+                violating_roles.append(str(resource.logical_resource_id))
+          elif hasattr(resource, 'assume_role_policy_document') and resource.assume_role_policy_document:
+            if self.debug:
+              print('has policy obects ' + lineno())
+
+              if resource.assume_role_policy_document.wildcard_allowed_actions():
+                if self.debug:
+                  print('has wildcard allowed actions')
+
+                violating_roles.append(str(resource.logical_resource_id))
+
     else:
       if self.debug:
         print('no violating_roles' + lineno())

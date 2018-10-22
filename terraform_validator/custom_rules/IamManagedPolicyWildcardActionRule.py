@@ -67,7 +67,7 @@ class IamManagedPolicyWildcardActionRule(BaseRule):
           if self.debug:
               print('resources: '+str(resource)+lineno())
               print('vars: '+str(vars(resource))+lineno())
-          if hasattr(resource,'policy_document'):
+          if hasattr(resource,'policy_document') and resource.policy_document:
             if self.debug:
                 print('has policy document '+lineno())
                 print('vars: '+str(vars(resource.policy_document)))
@@ -82,6 +82,25 @@ class IamManagedPolicyWildcardActionRule(BaseRule):
                         print('vars: '+str(vars(statements)))
 
                 if resource.policy_document.wildcard_allowed_actions():
+                    if self.debug:
+                        print('has wildcard allow actions????')
+
+                    violating_policies.append(str(resource.logical_resource_id))
+          elif hasattr(resource,'policy') and resource.policy:
+            if self.debug:
+                print('has policy document '+lineno())
+                print('vars: '+str(vars(resource.policy)))
+
+            if resource.policy:
+                if self.debug:
+                    print(resource.policy.statements)
+
+                for statements in resource.policy.statements:
+                    if self.debug:
+                        print('statements: '+str(statements))
+                        print('vars: '+str(vars(statements)))
+
+                if resource.policy.wildcard_allowed_actions():
                     if self.debug:
                         print('has wildcard allow actions????')
 

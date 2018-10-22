@@ -74,6 +74,13 @@ class RDSInstancePubliclyAccessibleRule(BaseRule):
             if str(resource.publiclyAccessible) == 'True' or str(resource.publiclyAccessible)=='true':
                   violating_rdsinstances.append(str(resource.logical_resource_id))
 
+          elif hasattr(resource,'publicly_accessible'):
+            if self.debug:
+              print('has publicly_accessible attribute')
+
+            if str(resource.publicly_accessible) == 'True' or str(resource.publicly_accessible)=='true':
+                  violating_rdsinstances.append(str(resource.logical_resource_id))
+
     else:
       if self.debug:
         print('no violating_rdsinstances' + lineno())

@@ -13,8 +13,8 @@ class EC2SecurityGroup(ModelElement):
         """
 
         ModelElement.__init__(self, cfn_model)
-        self.securityGroupIngress = []
-        self.securityGroupEgress = []
+        #self.securityGroupIngress = []
+        #self.securityGroupEgress = []
         self.ingresses = []
         self.egresses = []
         self.tags = []

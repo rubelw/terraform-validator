@@ -6,8 +6,31 @@ provider "aws" {
 }
 
 
-resource "aws_iam_policy" "policy" {
-  name        = "test_policy"
+resource "aws_iam_group" "SomeGroup" {
+  name = "SomeGroups"
+  path = "/"
+}
+
+
+
+
+#{
+#  "Resources": {
+#    "SomeGroup": {
+#      "Type": "AWS::IAM::Group"
+#    },
+
+
+
+resource "aws_iam_policy_attachment" "test-attach" {
+  name       = "test-attachment"
+  groups     = ["${aws_iam_group.SomeGroup.name}"]
+  policy_arn = "${aws_iam_policy.NotResourcePolicy.arn}"
+}
+
+
+resource "aws_iam_policy" "NotResourcePolicy" {
+  name        = "NotResourcePolicy"
   path        = "/"
   description = "My test policy"
 
@@ -16,11 +39,29 @@ resource "aws_iam_policy" "policy" {
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Action": [
-        "ec2:Describe*"
-      ],
+      "Action":  "rds:CreateDBInstance",
       "Effect": "Allow",
-      "Resource": "*"
+      "NotResource": {
+        "Fn::Join": [
+          "",
+          [
+            "arn:aws:rds:",
+            {
+              "Ref": "AWS::Region"
+            },
+            ":",
+            {
+              "Ref": "AWS::AccountId"
+            },
+            ":db:test*"
+          ]
+        ]
+      },
+      "Condition": {
+        "StringEquals": {
+          "rds:DatabaseEngine": "mysql"
+        }
+      }
     }
   ]
 }
@@ -28,11 +69,6 @@ EOF
 }
 
 
-#{
-#  "Resources": {
-#    "SomeGroup": {
-#      "Type": "AWS::IAM::Group"
-#    },
 
 #    "NotResourcePolicy": {
 #      "Type": "AWS::IAM::Policy",

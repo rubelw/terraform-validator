@@ -6,33 +6,22 @@ provider "aws" {
 }
 
 
-resource "aws_iam_user" "lb" {
-  name = "loadbalancer"
-  path = "/system/"
+resource "aws_iam_user" "myuser2" {
+  name = "myuser2"
 }
 
-resource "aws_iam_access_key" "lb" {
-  user = "${aws_iam_user.lb.name}"
+resource "aws_iam_group" "group" {
+  name = "test-group"
 }
 
-resource "aws_iam_user_policy" "lb_ro" {
-  name = "test"
-  user = "${aws_iam_user.lb.name}"
+resource "aws_iam_group_membership" "team" {
+  name = "tf-testing-group-membership"
 
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "ec2:Describe*"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
-    }
+  users = [
+    "${aws_iam_user.myuser2.name}"
   ]
-}
-EOF
+
+  group = "${aws_iam_group.group.name}"
 }
 
 

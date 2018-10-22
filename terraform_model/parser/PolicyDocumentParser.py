@@ -40,6 +40,7 @@ class PolicyDocumentParser:
 
         if self.debug:
             print('have policy document: '+lineno())
+            print('type: '+str(type(raw_policy_document))+lineno())
 
 
         if type(raw_policy_document) == type(str()):
@@ -161,9 +162,19 @@ class PolicyDocumentParser:
                 print('version in policy document: '+lineno())
                 print('type: '+str(type(raw_policy_document)))
 
+                print('version: '+str(raw_policy_document['version'])+lineno())
+
+            policy_document.version = raw_policy_document['version']
+
+        if 'Version' in raw_policy_document:
+            if self.debug:
+                print('Version in policy document: '+lineno())
+                print('type: '+str(type(raw_policy_document)))
+
                 print('version: '+str(raw_policy_document['Version'])+lineno())
 
             policy_document.version = raw_policy_document['Version']
+
 
         if 'statement' in raw_policy_document:
             if self.debug:
@@ -174,7 +185,7 @@ class PolicyDocumentParser:
 
                 if len(raw_policy_document['statement'])>1:
                     if self.debug:
-                        print('more than one statemnt')
+                        print('more than one statement')
 
                 for statement in raw_policy_document['statement']:
                     if self.debug:
@@ -183,6 +194,17 @@ class PolicyDocumentParser:
                     parsed_statement = self.parse_statement(streamlined_array)
                     if self.debug:
                         print('parsed_statement: '+str(parsed_statement)+lineno())
+                        print('actions: '+str(parsed_statement.actions)+lineno())
+                        print('not_actions: '+str(parsed_statement.not_actions)+lineno())
+                        print('resources: '+str(parsed_statement.resources)+lineno())
+                        print('not_resources: '+str(parsed_statement.not_resources)+lineno())
+                        print('sid: '+str(parsed_statement.sid)+lineno())
+                        print('effect: '+str(parsed_statement.effect)+lineno())
+                        print('condition: '+str(parsed_statement.condition)+lineno())
+                        print('principal: '+str(parsed_statement.principal)+lineno())
+                        print('non principal: '+str(parsed_statement.not_principal)+lineno())
+
+
                     policy_document.statements.append(parsed_statement)
 
             elif type(raw_policy_document['statement'])== type(dict()):
@@ -217,6 +239,63 @@ class PolicyDocumentParser:
                 print('statement types: '+str(type(policy_document.statements))+lineno())
                 print('type: '+str(type(policy_document))+lineno())
 
+        if 'Statement' in raw_policy_document:
+            if self.debug:
+                print('has statement in raw policy document'+lineno())
+                print('statement: '+str(raw_policy_document['Statement'])+lineno())
+
+            if type(raw_policy_document['Statement'])==type(list()):
+
+                if len(raw_policy_document['Statement'])>1:
+                    if self.debug:
+                        print('more than one Statemnt')
+
+                for statement in raw_policy_document['Statement']:
+                    if self.debug:
+                        print('Statement: '+str(statement)+lineno())
+                    streamlined_array = self.streamline_array(statement)
+                    parsed_statement = self.parse_statement(streamlined_array)
+                    if self.debug:
+                        print('parsed_statement: '+str(parsed_statement)+lineno())
+                    policy_document.statements.append(parsed_statement)
+
+            elif type(raw_policy_document['Statement'])== type(dict()):
+
+                if self.debug:
+                    print('Statement: ' + str(raw_policy_document['Statement'])+lineno())
+
+                parsed_statement = self.parse_statement(raw_policy_document['Statement'])
+                if self.debug:
+                    print('parsed_statement: ' + str(parsed_statement) + lineno())
+                policy_document.statements.append(parsed_statement)
+
+
+            elif type(raw_policy_document['Statement']) == type(str()):
+                if self.debug:
+                    print('Statement: ' + str(raw_policy_document['Statement'])+lineno())
+
+                parsed_statement = self.parse_statement(raw_policy_document['Statement'])
+                if self.debug:
+                    print('parsed_statement: ' + str(parsed_statement) + lineno())
+                policy_document.statements.append(parsed_statement)
+
+
+            else:
+                if self.debug:
+                    print('unknown type: '+lineno())
+                sys.exit(1)
+
+            if self.debug:
+                print('policy_document: '+str(vars(policy_document))+lineno())
+                print('statments'+str(policy_document.statements)+lineno())
+                print('statement types: '+str(type(policy_document.statements))+lineno())
+                print('type: '+str(type(policy_document))+lineno())
+
+
+        if self.debug:
+            print('returning a policy document to caller '+lineno())
+
+
         return policy_document
 
 
@@ -235,23 +314,68 @@ class PolicyDocumentParser:
 
         statement = Statement(self.debug)
         if 'effect' in raw_statement:
+            if self.debug:
+                print('effect in raw_statement '+lineno())
+
             statement.effect = raw_statement['effect']
+        if 'Effect' in raw_statement:
+            statement.effect = raw_statement['Effect']
+
         if 'sid' in raw_statement:
+            if self.debug:
+                print('sid in raw_statement '+lineno())
             statement.sid = raw_statement['sid']
+        if 'Sid' in raw_statement:
+            statement.sid = raw_statement['Sid']
+
         if 'condition' in raw_statement:
+            if self.debug:
+                print('condition in raw_statement '+lineno())
             statement.condition = raw_statement['condition']
+        if 'Condition' in raw_statement:
+            statement.condition = raw_statement['Condition']
+
         if 'action' in raw_statement:
+            if self.debug:
+                print('action in raw_statement '+lineno())
             statement.actions.append(raw_statement['action'])
+        if 'Action' in raw_statement:
+            statement.actions.append(raw_statement['Action'])
+
+        if 'NotAction' in raw_statement:
+            statement.not_actions.append(raw_statement['NotAction'])
         if 'not_actions' in raw_statement:
+            if self.debug:
+                print('not_actions in raw_statement '+lineno())
             statement.not_actions.append(raw_statement['not_actions'])
+
         if 'resources' in raw_statement:
+            if self.debug:
+                print('resources in raw_statement '+lineno())
             statement.resources.append(raw_statement['resources'])
+        if 'Resource' in raw_statement:
+            statement.resources.append(raw_statement['Resource'])
+
         if 'not_resources' in raw_statement:
+            if self.debug:
+                print('not_resources in raw_statement '+lineno())
             statement.not_resources.append(raw_statement['not_resources'])
+        if 'NotResource' in raw_statement:
+            statement.not_resources.append(raw_statement['NotResource'])
+
         if 'principals' in raw_statement:
+            if self.debug:
+                print('principals in raw_statement '+lineno())
             statement.principal = raw_statement['principals']
+        if 'Principal' in raw_statement:
+            statement.principal = raw_statement['Principal']
+
         if 'not_principals' in raw_statement:
+            if self.debug:
+                print('not_principals in raw_statement '+lineno())
             statement.not_principal = raw_statement['not_principals']
+        if 'NotPrincipal' in raw_statement:
+            statement.not_principal = raw_statement['NotPrincipal']
 
         if self.debug:
             print('raw_statement: '+str(raw_statement)+lineno())
@@ -269,6 +393,7 @@ class PolicyDocumentParser:
                 print('principal: '+str(statement.principal)+lineno())
             if statement.not_principal:
                 print('not_principal: '+str(statement.not_principal)+lineno())
+
 
             print("\n\n###############################################")
             print("statement: "+str(vars(statement))+lineno())

@@ -64,7 +64,7 @@ class IamManagedPolicyNotResourceRule(BaseRule):
                 if self.debug:
                     print('resource: '+str(resource))
 
-                if hasattr(resource,'policy_document'):
+                if hasattr(resource,'policy_document') and resource.policy_document:
                     if self.debug:
                         print('has policy document '+lineno())
 
@@ -76,6 +76,17 @@ class IamManagedPolicyNotResourceRule(BaseRule):
 
                             violating_policies.append(str(resource.logical_resource_id))
 
+                elif hasattr(resource,'policy') and resource.policy:
+                    if self.debug:
+                        print('has policy document '+lineno())
+
+                        print('policy document: '+str(resource.policy)+lineno())
+                    if resource.policy:
+                        if resource.policy.allows_not_resource():
+                            if self.debug:
+                                print('has allows not resource')
+
+                            violating_policies.append(str(resource.logical_resource_id))
                 else:
                     if self.debug:
                         print('does not have policy document'+lineno())

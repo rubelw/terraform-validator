@@ -6,9 +6,9 @@ provider "aws" {
 }
 
 
-resource "aws_s3_bucket" "b" {
-  bucket = "my-tf-test-bucket"
-  acl    = "private"
+resource "aws_s3_bucket" "S3BucketRead" {
+  bucket = "fakebucketfakebucket"
+  acl    = "public-read"
 
   tags {
     Name        = "My bucket"
@@ -16,6 +16,15 @@ resource "aws_s3_bucket" "b" {
   }
 }
 
+resource "aws_s3_bucket" "S3BucketReadWrite" {
+  bucket = "fakebucketfakebucket2"
+  acl    = "public-read-write"
+
+  tags {
+    Name        = "My bucket"
+    Environment = "Dev"
+  }
+}
 
 #{
 #  "Resources": {

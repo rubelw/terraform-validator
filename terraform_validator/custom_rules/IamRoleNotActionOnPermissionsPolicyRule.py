@@ -66,8 +66,9 @@ class IamRoleNotActionOnPermissionsPolicyRule(BaseRule):
       for resource in resources:
           if self.debug:
             print('resource: '+str(resource)+lineno())
+            print('vars: '+str(vars(resource))+lineno())
 
-          if hasattr(resource,'policy_objects'):
+          if hasattr(resource,'policy_objects') and resource.policy_objects:
             if self.debug:
               print('has policy obects '+lineno())
 
@@ -78,6 +79,15 @@ class IamRoleNotActionOnPermissionsPolicyRule(BaseRule):
                 print('vars: ' + str(vars(policy.policy_document)) + lineno())
 
               if policy.policy_document.allows_not_action(debug=self.debug):
+                if self.debug:
+                  print('has allows not action')
+
+                violating_roles.append(str(resource.logical_resource_id))
+          elif hasattr(resource, 'assume_role_policy_document') and resource.assume_role_policy_document:
+            if self.debug:
+              print('has policy obects ' + lineno())
+
+              if resource.assume_role_policy_document.allows_not_action(debug=self.debug):
                 if self.debug:
                   print('has allows not action')
 

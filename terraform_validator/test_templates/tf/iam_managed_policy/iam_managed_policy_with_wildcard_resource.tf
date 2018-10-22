@@ -6,8 +6,29 @@ provider "aws" {
 }
 
 
-resource "aws_iam_policy" "policy" {
-  name        = "test_policy"
+resource "aws_iam_group" "SomeGroup" {
+  name = "SomeGroups"
+  path = "/"
+}
+
+
+
+#{
+#  "Resources": {
+#    "TestDBGroup": {
+#      "Type": "AWS::IAM::Group"
+#    },
+
+
+resource "aws_iam_policy_attachment" "test-attach" {
+  name       = "test-attachment"
+  groups     = ["${aws_iam_group.SomeGroup.name}"]
+  policy_arn = "${aws_iam_policy.CreateTestDBPolicy4.arn}"
+}
+
+
+resource "aws_iam_policy" "CreateTestDBPolicy4" {
+  name        = "CreateTestDBPolicy4"
   path        = "/"
   description = "My test policy"
 
@@ -16,11 +37,54 @@ resource "aws_iam_policy" "policy" {
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Action": [
-        "ec2:Describe*"
-      ],
+      "Action":  "rds:CreateDBInstance",
       "Effect": "Allow",
-      "Resource": "*"
+      "NotResource": {
+        "Fn::Join": [
+          "",
+          [
+            "arn:aws:rds:",
+            {
+              "Ref": "AWS::Region"
+            },
+            ":",
+            {
+              "Ref": "AWS::AccountId"
+            },
+            ":db:test*"
+          ]
+        ]
+      },
+      "Condition": {
+        "StringEquals": {
+          "rds:DatabaseEngine": "mysql"
+        }
+      }
+    },
+    {
+      "Effect": "Allow",
+      "Action": "rds:CreateDBInstance",
+      "Resource": {
+        "Fn::Join": [
+          "",
+          [
+            "arn:aws:rds:",
+            {
+              "Ref": "AWS::Region"
+            },
+            ":",
+            {
+              "Ref": "AWS::Region"
+            },
+            ":db:test*"
+          ]
+        ]
+      },
+      "Condition": {
+        "StringEquals": {
+          "rds:DatabaseClass": "db.t2.micro"
+        }
+      }
     }
   ]
 }
@@ -28,11 +92,7 @@ EOF
 }
 
 
-#{
-#  "Resources": {
-#    "TestDBGroup": {
-#      "Type": "AWS::IAM::Group"
-#    },
+
 #    "CreateTestDBPolicy4": {
 #      "Type": "AWS::IAM::ManagedPolicy",
 #      "Properties": {

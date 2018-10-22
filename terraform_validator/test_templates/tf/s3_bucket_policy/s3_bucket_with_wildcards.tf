@@ -6,12 +6,21 @@ provider "aws" {
 }
 
 
-resource "aws_s3_bucket" "b" {
-  bucket = "my_tf_test_bucket"
+resource "aws_s3_bucket" "S3Bucket" {
+  bucket = "fakebucketfakebucket"
 }
 
-resource "aws_s3_bucket_policy" "b" {
-  bucket = "${aws_s3_bucket.b.id}"
+resource "aws_s3_bucket" "S3Bucket2" {
+  bucket = "fakebucketfakebucket2"
+}
+
+resource "aws_s3_bucket" "S3Bucket3" {
+  bucket = "fakebucketfakebucket3"
+}
+
+
+resource "aws_s3_bucket_policy" "S3BucketPolicy" {
+  bucket = "${aws_s3_bucket.S3Bucket.id}"
   policy =<<POLICY
 {
   "Version": "2012-10-17",
@@ -19,19 +28,62 @@ resource "aws_s3_bucket_policy" "b" {
   "Statement": [
     {
       "Sid": "IPAllow",
-      "Effect": "Deny",
-      "Principal": "*",
-      "Action": "s3:*",
-      "Resource": "arn:aws:s3:::my_tf_test_bucket/*",
-      "Condition": {
-         "IpAddress": {"aws:SourceIp": "8.8.8.8/32"}
-      } 
+      "Effect": "Allow",
+      "Principal": { "AWS": ["156460612806"] },
+      "Action": "*",
+      "Resource": "arn:aws:s3:::fakebucketfakebucket/*"
     } 
   ]
 }
 POLICY
 }
 
+
+
+resource "aws_s3_bucket_policy" "S3BucketPolicy2" {
+  bucket = "${aws_s3_bucket.S3Bucket2.id}"
+  policy =<<POLICY
+{
+  "Version": "2012-10-17",
+  "Id": "MYBUCKETPOLICY2",
+  "Statement": [
+    {
+      "Sid": "IPAllow",
+      "Effect": "Allow",
+      "Principal": { "AWS": "*" },
+      "Action": "s3:*",
+      "Resource": "arn:aws:s3:::fakebucketfakebucket2/*"
+    }
+  ]
+}
+POLICY
+}
+
+
+
+resource "aws_s3_bucket_policy" "S3BucketPolicy3" {
+  bucket = "${aws_s3_bucket.S3Bucket3.id}"
+  policy =<<POLICY
+{
+  "Version": "2012-10-17",
+  "Id": "MYBUCKETPOLICY3",
+  "Statement": [
+    {
+      "Sid": "IPDeny",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::fakebucketfakebucket3/*",
+      "Condition": {
+        "StringNotEquals": {
+          "s3:x-amz-server-side-encryption" : "AES256"
+        }
+      }
+    }
+  ]
+}
+POLICY
+}
 
 #{
 #  "Resources": {

@@ -42,6 +42,8 @@ class PolicyDocument:
 
             if len(statement.wildcard_resources())>0 and str(statement.effect) == 'Allow':
                 return True
+            elif len(statement.wildcard_resources())>0 and str(statement.effect) == 'allow':
+                return True
 
         return False
 
@@ -64,7 +66,7 @@ class PolicyDocument:
                 print('wildcard_actions:'+str(statement.wildcard_actions()))
                 print("#######################################################\n")
 
-            if str(statement.effect) == 'Allow':
+            if str(statement.effect) == 'Allow' or str(statement.effect) == 'allow':
                 if self.debug or debug:
                     print('effect is to allow'+lineno())
 
@@ -119,7 +121,12 @@ class PolicyDocument:
 
                 if statement.wildcard_principal():
                     return True
+            elif str(statement.effect) == 'allow':
+                if self.debug or debug:
+                    print('effect is to allow'+lineno())
 
+                if statement.wildcard_principal():
+                    return True
         return False
 
 
@@ -141,7 +148,10 @@ class PolicyDocument:
                 if self.debug or debug:
                     print('has not actions and effect is allow'+lineno())
                 return True
-
+            elif len(statement.not_actions) > 0 and str(statement.effect) == 'allow':
+                if self.debug or debug:
+                    print('has not actions and effect is allow'+lineno())
+                return True
         return False
 
 
@@ -164,10 +174,13 @@ class PolicyDocument:
                 if 'NotResource' in statement and 'Effect' in statement:
                     if len(statement['NotResource'])>0 and statement['Effect'] == 'Allow':
                         return True
+                elif 'not_resources' in statement and 'effect' in statement:
+                    if len(statement['not_resources'])>0 and statement['effect'] == 'allow':
+                        return True
 
             elif hasattr(statement,'not_resources') and hasattr(statement,'effect'):
 
-                    if len(statement.not_resources)>0 and str(statement.effect) == 'Allow':
+                    if len(statement.not_resources)>0 and str(statement.effect) == 'allow':
                         return True
 
         return False
@@ -180,18 +193,35 @@ class PolicyDocument:
       """
       if self.debug or debug:
         print('allows_not_principal'+lineno())
+        print('vars: '+str(vars(self))+lineno())
 
       for statement in self.statements:
           if self.debug or debug:
               print('statement: ' + str(statement) + lineno())
+              print('vars: '+str(vars(statement))+lineno())
+              print('type: '+str(type(statement))+lineno())
 
           if type(statement) == type(dict()):
+
+              if self.debug:
+                  print('is a dict: '+lineno())
+                  print('statement: '+str(statement)+lineno())
 
               if 'NotPrincipal' in statement and 'Effect' in statement:
                   if len(statement['NotPrincipal']) > 0 and statement['Effect'] == 'Allow':
                       return True
 
-          elif hasattr(statement, 'not_principal') and hasattr(statement, 'effect'):
+              elif 'not_principal' in statement and 'effect' in statement:
+                  if len(statement['not_principal']) > 0 and ( statement['effect'] == 'allow' and statement['effect'] == 'Allow'):
+                      return True
+
+          elif hasattr(statement, 'not_principal') and statement.not_principal and hasattr(statement, 'effect'):
+
+              if statement.not_principal and statement.effect:
+                  if len(statement.not_principal) > 0 and ( str(statement.effect) == 'Allow' or statement.effect == 'allow'):
+                    return True
+
+          elif hasattr(statement, 'NotPrincipal') and hasattr(statement, 'Effect'):
               if statement.not_principal and statement.effect:
                   if len(statement.not_principal) > 0 and str(statement.effect) == 'Allow':
                     return True

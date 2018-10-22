@@ -87,4 +87,5 @@ class IamRoleWildcardActionOnTrustPolicyRule(BaseRule):
       if self.debug:
         print('no violating_roles'+lineno())
 
+
     return violating_roles

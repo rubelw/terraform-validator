@@ -64,9 +64,12 @@ class S3BucketPolicyWildcardPrincipalRule(BaseRule):
     if len(resources) > 0:
       for resource in resources:
         if self.debug:
+          print("\n\n##########################################")
+          print(str(dir(resource)) + lineno())
           print('resource: ' + str(resource) + lineno())
+          print("##############################################\n")
 
-        if hasattr(resource, 'policy_document'):
+        if hasattr(resource, 'policy_document') and resource.policy_document:
 
           if resource.policy_document:
             if self.debug:
@@ -78,6 +81,20 @@ class S3BucketPolicyWildcardPrincipalRule(BaseRule):
                 print('has wildcard allowsd principal'+lineno())
 
               violating_policies.append(str(resource.logical_resource_id))
+
+        elif hasattr(resource, 'policy') and resource.policy:
+
+          if resource.policy:
+            if self.debug:
+              print('has policy document ' + lineno())
+              print(resource.policy.statements)
+
+            if resource.policy.wildcard_allowed_principals():
+              if self.debug:
+                print('has wildcard allowsd principal'+lineno())
+
+              violating_policies.append(str(resource.logical_resource_id))
+
     else:
       if self.debug:
         print('no violating_policies' + lineno())

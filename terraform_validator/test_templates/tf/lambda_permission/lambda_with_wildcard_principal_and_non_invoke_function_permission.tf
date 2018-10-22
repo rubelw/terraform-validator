@@ -6,31 +6,13 @@ provider "aws" {
 }
 
           
-resource "aws_iam_role" "iam_for_lambda" {
-  name = "iam_for_lambda"
 
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
-}
 
-resource "aws_lambda_function" "test_lambda" {
+resource "aws_lambda_function" "AppendItemToListFunction" {
   filename         = "lambda_function_payload.zip"
   function_name    = "lambda_function_name"
-  role             = "${aws_iam_role.iam_for_lambda.arn}"
-  handler          = "exports.test"
+  role             = "${aws_iam_role.LambdaExecutionRole.arn}"
+  handler          = "index.handler"
   source_code_hash = "${base64sha256(file("lambda_function_payload.zip"))}"
   runtime          = "nodejs8.10"
 
@@ -63,6 +45,15 @@ resource "aws_lambda_function" "test_lambda" {
 #      }
 #    },
 
+resource "aws_lambda_permission" "lambdaPermission" {
+  statement_id   = "AllowExecutionFromCloudWatch"
+  action         = "lambda:InvokeFunction"
+  function_name  = "${aws_lambda_function.test_lambda.function_name}"
+  principal      = "*"
+  source_arn     = "arn:aws:sns:us-east-1:806199016981:AmazonIpSpaceChanged"
+}
+
+
 #    "lambdaPermission": {
 #      "Type": "AWS::Lambda::Permission",
 #      "Properties": {
@@ -76,6 +67,15 @@ resource "aws_lambda_function" "test_lambda" {
 #      }
 #    },
 
+resource "aws_lambda_permission" "lambdaPermission2" {
+  statement_id   = "AllowExecutionFromCloudWatch"
+  action         = "lambda:InvokeFunction"
+  function_name  = "${aws_lambda_function.test_lambda.function_name}"
+  principal      = "555555555555"
+  source_arn     = "arn:aws:sns:us-east-1:806199016981:AmazonIpSpaceChanged"
+}
+
+
 #    "lambdaPermission2": {
 #      "Type": "AWS::Lambda::Permission",
 #      "Properties": {
@@ -88,6 +88,36 @@ resource "aws_lambda_function" "test_lambda" {
 #        "SourceArn": "arn:aws:sns:us-east-1:806199016981:AmazonIpSpaceChanged"
 #      }
 #    },
+
+resource "aws_iam_role" "LambdaExecutionRole" {
+  name = "LambdaExecutionRole"
+  path = '/'
+  assume_role_policy = "${data.aws_iam_policy_document.example.json}"
+
+
+data "aws_iam_policy_document" "example" {
+  statement {
+    effect = "allow"
+    actions = [
+      "logs:*",
+    ],
+    resources = [
+     "arn:aws:logs:*:*:*"
+    ]
+  }
+  statement {
+    effect = "allow"
+    actions = [
+      "sts:AssumeRole",
+    ],
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+  }
+
+}
+
 
 #    "LambdaExecutionRole": {
 #      "Type": "AWS::IAM::Role",

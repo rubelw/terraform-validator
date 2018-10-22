@@ -124,5 +124,6 @@ class RDSInstanceMasterUserPasswordRule(BaseRule):
 
     if self.debug:
       print('Does not have noecho property '+lineno())
-        
+
+    sys.exit(1)
     return False

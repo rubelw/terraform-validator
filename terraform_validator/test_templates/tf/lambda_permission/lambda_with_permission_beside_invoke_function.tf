@@ -26,7 +26,7 @@ resource "aws_iam_role" "iam_for_lambda" {
 EOF
 }
 
-resource "aws_lambda_function" "test_lambda" {
+resource "aws_lambda_function" "AppendItemToListFunction" {
   filename         = "lambda_function_payload.zip"
   function_name    = "lambda_function_name"
   role             = "${aws_iam_role.iam_for_lambda.arn}"
@@ -63,6 +63,16 @@ resource "aws_lambda_function" "test_lambda" {
 #      }
 #    },
 
+resource "aws_lambda_permission" "lambdaPermissionDeleteAlias" {
+  statement_id   = "AllowExecutionFromCloudWatch"
+  action         = "lambda:InvokeFunction"
+  function_name  = "${aws_lambda_function.AppendItemToListFunction.function_name}"
+  principal      = "555555555555"
+  source_arn     = "arn:aws:sns:us-east-1:806199016981:AmazonIpSpaceChanged"
+  source_account = "806199016981"
+}
+
+
 #    "lambdaPermissionDeleteAlias": {
 #      "Type": "AWS::Lambda::Permission",
 #      "Properties": {
@@ -76,6 +86,14 @@ resource "aws_lambda_function" "test_lambda" {
 #      }
 #    },
 
+resource "aws_lambda_permission" "lambdaPermission2" {
+  statement_id   = "AllowExecutionFromCloudWatch"
+  action         = "lambda:InvokeFunction"
+  function_name  = "${aws_lambda_function.test_lambda.function_name}"
+  principal      = "555555555555"
+  source_arn     = "arn:aws:sns:us-east-1:806199016981:AmazonIpSpaceChanged"
+}
+
 #    "lambdaPermission2": {
 #      "Type": "AWS::Lambda::Permission",
 #      "Properties": {
@@ -88,6 +106,35 @@ resource "aws_lambda_function" "test_lambda" {
 #        "SourceArn": "arn:aws:sns:us-east-1:806199016981:AmazonIpSpaceChanged"
 #      }
 #    },
+
+resource "aws_iam_role" "LambdaExecutionRole" {
+  name = "LambdaExecutionRole"
+  path = '/'
+  assume_role_policy = "${data.aws_iam_policy_document.example.json}"
+
+
+data "aws_iam_policy_document" "example" {
+  statement {
+    effect = "allow"
+    actions = [
+      "logs:*",
+    ],
+    resources = [
+     "arn:aws:logs:*:*:*"
+    ]
+  }
+  statement {
+    effect = "allow"
+    actions = [
+      "sts:AssumeRole",
+    ],
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+  }
+
+}
 
 #    "LambdaExecutionRole": {
 #      "Type": "AWS::IAM::Role",

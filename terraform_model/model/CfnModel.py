@@ -188,7 +188,11 @@ class CfnModel:
             "AWS::IAM::ManagedPolicy":'aws_iam_policy_attachment',
             "AWS::SNS::TopicPolicy": 'aws_sns_topic_policy',
             "AWS::EC2::SecurityGroupIngress": 'aws_security_group_rule',
-            "AWS::EC2::SecurityGroupEgress": 'aws_security_group_rule'
+            "AWS::EC2::SecurityGroupEgress": 'aws_security_group_rule',
+            "AWS::S3::Bucket":'aws_s3_bucket',
+            "AWS::RDS::DBInstance":'aws_db_instance',
+            "AWS::CloudFront::Distribution": 'aws_cloudfront_distribution',
+            "AWS::IAM::UserToGroupAddition":'aws_iam_policy_attachment'
         }
 
         if resource_type in resource_map:

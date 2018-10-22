@@ -66,9 +66,13 @@ class ElasticLoadBalancerAccessLoggingRule(BaseRule):
                     print('resource: ' + str(resource)+lineno())
                     print('vars: '+str(vars(resource))+lineno())
 
-                if hasattr(resource,'access_logs'):
-                    if resource.access_logs == None or ('enabled' in resource.access_logs and resource.access_logs['enabled'] != True):
-                        violating_elbs.append(str(resource.logical_resource_id))
+                if hasattr(resource,'access_logs') and resource.access_logs:
+                    if self.debug:
+                        print('has access_logs '+lineno())
+                else:
+                    if self.debug:
+                        print('does not have access logs set and should '+lineno())
+                    violating_elbs.append(str(resource.logical_resource_id))
 
         else:
             if self.debug:

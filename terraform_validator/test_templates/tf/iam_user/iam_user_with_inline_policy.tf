@@ -6,18 +6,16 @@ provider "aws" {
 }
 
 
-resource "aws_iam_user" "lb" {
-  name = "loadbalancer"
-  path = "/system/"
+
+
+resource "aws_iam_user" "userWithInline" {
+  name = "myuser2"
 }
 
-resource "aws_iam_access_key" "lb" {
-  user = "${aws_iam_user.lb.name}"
-}
-
-resource "aws_iam_user_policy" "lb_ro" {
-  name = "test"
-  user = "${aws_iam_user.lb.name}"
+resource "aws_iam_policy" "policy" {
+  name        = "somePolicy"
+  path        = "/"
+  description = "My test policy"
 
   policy = <<EOF
 {
@@ -25,16 +23,22 @@ resource "aws_iam_user_policy" "lb_ro" {
   "Statement": [
     {
       "Action": [
-        "ec2:Describe*"
+        "s3:dosomething"
       ],
       "Effect": "Allow",
-      "Resource": "*"
+      "Resource": "arn:something"
     }
   ]
 }
 EOF
 }
 
+
+resource "aws_iam_policy_attachment" "test-attach" {
+  name       = "test-attachment"
+  users      = ["${aws_iam_user.userWithInline.name}"]
+  policy_arn = "${aws_iam_policy.somePolicy.arn}"
+}
 
 #{
 #  "Resources": {

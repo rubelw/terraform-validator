@@ -68,6 +68,12 @@ class S3BucketPublicReadWriteAclRule(BaseRule):
           if resource.accessControl:
             if resource.accessControl == 'PublicReadWrite':
               logical_resource_ids.append(str(resource.logical_resource_id))
+        elif hasattr(resource,'acl'):
+          if self.debug:
+            print('has acl '+lineno())
+          if resource.acl:
+            if resource.acl == 'public-read-write':
+              logical_resource_ids.append(str(resource.logical_resource_id))
 
     else:
       if self.debug:

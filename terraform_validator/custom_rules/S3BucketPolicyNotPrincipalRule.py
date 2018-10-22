@@ -61,10 +61,15 @@ class S3BucketPolicyNotPrincipalRule(BaseRule):
 
     if len(resources) > 0:
       for resource in resources:
-        if self.debug:
-          print('resource: ' + str(resource) + lineno())
 
-        if hasattr(resource, 'policy_document'):
+        if self.debug:
+          print("\n\n##########################################")
+          print(str(dir(resource)) + lineno())
+          print('resource: ' + str(resource) + lineno())
+          print('logical resource id: '+str(resource.logical_resource_id)+lineno())
+          print("##############################################\n")
+
+        if hasattr(resource, 'policy_document') and resource.policy_document:
 
           if resource.policy_document:
             if self.debug:
@@ -76,6 +81,20 @@ class S3BucketPolicyNotPrincipalRule(BaseRule):
                 print('has allows not principal'+lineno())
 
               violating_policies.append(str(resource.logical_resource_id))
+
+        elif hasattr(resource, 'policy') and resource.policy:
+
+          if resource.policy:
+            if self.debug:
+              print('has policy ' + lineno())
+
+              # print(resource.policy_document.policy_document.statements)
+            if resource.policy.allows_not_principal():
+              if self.debug:
+                print('has allows not principal' + lineno())
+
+              violating_policies.append(str(resource.logical_resource_id))
+
 
     else:
       if self.debug:

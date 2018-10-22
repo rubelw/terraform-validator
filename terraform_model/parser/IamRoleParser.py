@@ -46,6 +46,9 @@ class IamRoleParser:
             iam_role.assume_role_policy_document  =document_parser.parse(cfn_model, iam_role.assume_role_policy)
 
 
+        if debug:
+            print('Done parsing assume role policy with policy document parser '+lineno())
+
         for policy in iam_role.policies:
             if debug:
                 print('policy: '+str(policy)+lineno())
@@ -58,5 +61,6 @@ class IamRoleParser:
                 new_policy.policy_name = policy['PolicyName']
                 new_policy.policy_document = document_parser.parse(policy['PolicyDocument'])
                 iam_role.policy_objects.append(new_policy)
+
 
         return iam_role

@@ -76,6 +76,12 @@ class CloudFrontDistributionAccessLoggingRule(BaseRule):
 
                         violating_distributions.append(str(resource.logical_resource_id))
 
+                elif not hasattr(resource, 'logging_config'):
+                    if self.debug:
+                        print('does not have logging_config ' + lineno())
+
+                    violating_distributions.append(str(resource.logical_resource_id))
+
         else:
             if self.debug:
                 print('no violating_distributions'+lineno())

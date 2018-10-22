@@ -30,7 +30,8 @@ class WithPolicyDocumentParser:
             print("######################################\n")
 
 
-        parser = PolicyDocumentParser(debug)
-        resource.policy_document = parser.parse(cfn_model, resource.policy)
+        if hasattr(resource,'policy') and resource.policy:
+            parser = PolicyDocumentParser(debug)
+            resource.policy_document = parser.parse(cfn_model, resource.policy)
 
         return resource

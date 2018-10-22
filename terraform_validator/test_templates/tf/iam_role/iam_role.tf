@@ -6,26 +6,43 @@ provider "aws" {
 }
 
 
-resource "aws_iam_role" "test_role" {
-  name = "test_role"
+resource "aws_iam_role" "RootRole" {
+  name = "RootRole"
+  path = "/"
+  assume_role_policy = "${data.aws_iam_policy_document.example.json}"
+}
 
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
+data "aws_iam_policy_document" "example" {
+  statement {
+    effect = "allow"
+    actions = ["*"]
+    resources = "*"
+  }
+  statement {
+    effect = "allow"
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
     }
-  ]
-}
-EOF
+  },
+  statement {
+    effect = "allow"
+    actions = [
+      "sts:AssumeRole",
+    ],
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::324320755747:rootm"]
+    }
+  }
+
 }
 
+resource "aws_iam_instance_profile" "test_profile" {
+  name = "test_profile"
+  role = "${aws_iam_role.RootRole.name}"
+}
 
 
 #{
